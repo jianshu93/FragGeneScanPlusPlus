@@ -508,11 +508,11 @@ void init_thread_data(thread_data *td) {
     td->output_num_sequences = calloc(2, sizeof(int));
     td->input_num_sequences = calloc(2, sizeof(int));
 
-    td->input_buffer = (char ** *)malloc(sizeof(char **) * 2);
-    td->input_head_buffer = (char ** *)malloc(sizeof(char **) * 2);
-    td->output_buffer = (char ** *)malloc(sizeof(char **) * 2);
-    td->aa_buffer = (char ** *)malloc(sizeof(char **) * 2);
-    td->dna_buffer = (char ** *)malloc(sizeof(char **) * 2);
+    td->input_buffer = malloc(sizeof(char **) * 2);
+    td->input_head_buffer = malloc(sizeof(char **) * 2);
+    td->output_buffer = malloc(sizeof(char **) * 2);
+    td->aa_buffer = malloc(sizeof(char **) * 2);
+    td->dna_buffer = malloc(sizeof(char **) * 2);
 
     td->dna = calloc(STRINGLEN, sizeof(char));
     td->dna1 = calloc(STRINGLEN, sizeof(char));
@@ -526,11 +526,11 @@ void init_thread_data(thread_data *td) {
 
     int i;
     for (i = 0; i < 2; i++) {
-        td->input_buffer[i] = (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
-        td->input_head_buffer[i] = (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
-        td->output_buffer[i] = (char **) malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
-        td->aa_buffer[i] =   (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
-        td->dna_buffer[i] = (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->input_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->input_head_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->output_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->aa_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->dna_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
 
         int j;
         for (j = 0; j < MAX_SEQS_PER_BUFFER; j++) {
