@@ -55,7 +55,7 @@ void parseArguments(int argc, char **argv) {
 
     int c;
 
-    while ((c=getopt(argc, argv, "fs:m:o:w:r:t:p:dev")) != -1) {
+    while ((c = getopt(argc, argv, "fs:m:o:w:r:t:p:dev")) != -1) {
         switch (c) {
         case 's':
             strcpy(seq_file, optarg);
@@ -217,7 +217,7 @@ void initializeSemaphores() {
 
 #ifdef __APPLE__
     sem_unlink("/work_sema");
-    if ( ( work_sema = sem_open("/work_sema", O_CREAT, 0644, 1)) == SEM_FAILED ) {
+    if ((work_sema = sem_open("/work_sema", O_CREAT, 0644, 1)) == SEM_FAILED) {
         perror("ERROR: sem_open");
         exit(EXIT_FAILURE);
     }
@@ -282,7 +282,7 @@ void destroySemaphores() {
 
     char name[40];
     int j;
-    for (j=0; j<threadnum; j++) {
+    for (j = 0; j<threadnum; j++) {
         sprintf(name, "/sema_r%d", j);
         sem_unlink(name);
 
@@ -335,12 +335,12 @@ void initializeThreads() {
 
     int i,j;
     void *status;
-    for (j=0; j<threadnum; j++)
+    for (j = 0; j < threadnum; j++)
         pthread_create(&thread[j], 0, workerThread, (void *)(thread_datas+j));
 
-    for (j=0; j<threadnum; j++) {
-        for (i=0; i<2; i++) {
-            if ( (stopped_at_fpos = read_seq_into_buffer(fp, thread_datas + j, i))!=0) {
+    for (j = 0; j < threadnum; j++) {
+        for (i = 0; i < 2; i++) {
+            if ((stopped_at_fpos = read_seq_into_buffer(fp, thread_datas + j, i)) != 0) {
                 sem_post(thread_datas[j].sema_r);
             }
         }
@@ -550,7 +550,7 @@ void init_thread_data(thread_data *td) {
     td->c_delete = malloc(sizeof(int) * STRINGLEN);
 
     int i;
-    for (i=0; i<2; i++) {
+    for (i = 0; i < 2; i++) {
         td->input_buffer[i]	= (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
         td->input_head_buffer[i] = (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
         td->output_buffer[i]	= (char **) malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
@@ -558,7 +558,7 @@ void init_thread_data(thread_data *td) {
         td->dna_buffer[i]	= (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
 
         int j;
-        for (j=0; j<MAX_SEQS_PER_BUFFER; j++) {
+        for (j = 0; j < MAX_SEQS_PER_BUFFER; j++) {
             td->input_buffer[i][j] = calloc(1, STRINGLEN);
             td->input_head_buffer[i][j] = calloc(1, STRINGLEN);
             td->aa_buffer[i][j] = calloc(1, STRINGLEN);
@@ -689,7 +689,7 @@ void *writerThread(void *args) {
 void runViterbiOnBuffers(thread_data *td, unsigned int b) {
 
     unsigned int i;
-    for (i=0; i < td->input_num_sequences[b]; i++) {
+    for (i = 0; i < td->input_num_sequences[b]; i++) {
         unsigned int stringlength = strlen(td->input_buffer[b][i]);
         get_prob_from_cg(td->hmm, &train, td->input_buffer[b][i], stringlength);
 
