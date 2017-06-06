@@ -1,25 +1,26 @@
-Installation
-=============
+FragGeneScan Manual
+===================
+
+## Installation
 To install FragGeneScanPlus, please follow the steps below:
 
 1. Untar the downloaded file "FragGeneScanPlus.tar.gz". This will automatically generate the directory "FragGeneScan".
-
 2. Make sure that you also have the gcc C compiler.
-
 3. Run "makefile" to compile and build executable "FGS+"
-	make clean
-	make
+```
+make clean && make
+```
 
 
-Running the program
-====================
-1.  To run FragGeneScanPlus, 
+## Usage
+* To run FragGeneScanPlus, you can use the following info:
 
-USAGE: ./FGS+ -s [seq_file_name] -m [max_mem_use] -o [output_file_name] -w [1 or 0] -t [train_file_name] -p [thread_num] -e [1 or 0] -d [1 or 0] 
+```
+USAGE: ./FGS+ -s [seq_file_name] -m [max_mem_use] -o [output_file_name] -w [1 or 0] -t [train_file_name] -p [thread_num] -e [1 or 0] -d [1 or 0]
 
 EXAMPLE USAGE: ./FGS+ -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16
 
-MINIMAL USAGE: ./FGS+ -s [seq_file_name] -o [output_file_name] -w [1 or 0] -t [train_file_name] 
+MINIMAL USAGE: ./FGS+ -s [seq_file_name] -o [output_file_name] -w [1 or 0] -t [train_file_name]
 
 INFO: FragGeneScanPlus will only output the amino acid files by default. To obtain the gene coordinate information set -e to 1 and for the DNA files set -d to 1
 
@@ -45,33 +46,30 @@ INFO: FragGeneScanPlus will only output the amino acid files by default. To obta
        -e [1 or 0]         Output metadata for sequences.
        -d [1 or 0]         Output DNA file.
        -m [max_mem_usage]  Maximum amount of memory to be used per thread, in megabytes, default 1024 for 1GB
+```
 
-
-2. To test FragGeneScanPlus with a complete genomic sequence,
-
+* To test FragGeneScanPlus with a complete genomic sequence,
+```
 ./FGS+ -genome=./example/NC_000913.fna -out=./example/NC_000913.test  -complete=1  -train=complete
 
 [NC_000913.fna]: this sequence file has the complete genomic sequence of E.coli
+```
 
-
-
-3. To test FragGeneScanPlus with sequencing reads,
-
+* To test FragGeneScanPlus with sequencing reads,
+```
 ./FGS+ -genome=./example/NC_000913-454.fna -out=./example/NC_000913-454.test  -complete=0  -train=454_10
 
 [NC_000913-454.fna]: this sequence file has simulated reads (pyrosequencing, average length = 400 bp and sequencing error = 1%) generated using Metasim
+```
 
+## Output
+Upon completion, FragGeneScanPlus can generate three files [output_file_name].faa , [output_file_name].out and [output_file_name].ffn.
 
-
-
-Output
-============
-Upon completion, FragGeneScanPlus can generate three files [output_file_name].faa , [output_file_name].out and [output_file_name].ffn. 
-
-1. The "[output_file_name].faa" file lists amino acid sequences corresponding to the putative genes in "[output_file_name].out". 
+* The "[output_file_name].faa" file lists amino acid sequences corresponding to the putative genes in "[output_file_name].out".
 The "[output_file_name].faa" file is always generated and needs no flags to trigger it's output.
 An example of the "[output_file_name].faa" file looks like this,
 
+```
 >gi|49175990|ref|NC_000913.2| Escherichia coli str. K-12 substr. MG1655, complete genome start=108 e
 nd=338 strand=-
 VVTSLPLVEKKSPHCQVRAFFCVSCTRQPAPLPVVMVMVVVMVVLMRFMDVVYSVIFICLCAMPILVKVFSDLSQ
@@ -92,13 +90,13 @@ VKVYAPASSANMSVGFDVLGAAVTPVDGALLGDVVTVEAAETFSLNNLGRFADKLPSEPRENIVYQCWERFCQELGKQIP
 SVVAALMAMNEHCGKPLNDTRLLALMGELEGRISGSIHYDNVAPCFLGGMQLMIEENDIISQQVPGFDEWLWVLAYPGIKVSTAEARAILPAQYRRQDCI
 AHGRHLAGFIHACYSRQPELAAKLMKDVIAEPYRERLLPGFRQARQAVAEIGAVASGISGSGPTLFALCDKPETAQRVADWLGKNYLQNQEGFVHICRLD
 TAGARVLEN
+```
 
-
-
-2. The "[output_file_name].out" file lists the coordinates of putative genes. This file consists of five columns (start position, end position, strand, frame, score).
+* The "[output_file_name].out" file lists the coordinates of putative genes. This file consists of five columns (start position, end position, strand, frame, score).
 This file is not automatically generated. To obtain this file set the -e flag to 1
 An example of the "[output_file_name].out" file looks like this,
 
+```
 >gi|49175990|ref|NC_000913.2| Escherichia coli str. K-12 substr. MG1655, complete genome
 108     440     -       3       1.378688
 337     2799    +       1       1.303498
@@ -109,12 +107,14 @@ An example of the "[output_file_name].out" file looks like this,
 6529    7959    -       1       1.326412
 8238    9191    +       3       1.286832
 9306    9893    +       3       1.317067
+```
 
 
-3. The "[output_file_name].ffn" file lists nucleotide sequences corresponding to the putative genes in "[output_file_name].out".
+* The "[output_file_name].ffn" file lists nucleotide sequences corresponding to the putative genes in "[output_file_name].out".
 This file is not automatically generated. To obtain this file set the -d flag to 1
 An example of the "[output_file_name].out" file looks like this,
 
+```
 >gi|49175990|ref|NC_000913.2| Escherichia coli str. K-12 substr. MG1655, complete genome start=108 e
 nd=338 strand=-
 GTTGTTACCTCGTTACCTTTGGTCGAAAAAAAAAGCCCGCACTGTCAGGTGCGGGCTTTTTTCTGTGTTTCCTGTACGCGTCAGCCCGCACCGTTACCTG
@@ -126,10 +126,12 @@ TTGAAGTTCGGCGGTACATCAGTGGCAAATGCAGAACGTTTTCTGCGTGTTGCCGATATTCTGGAAAGCAATGCCAGGCA
 TCTCTGCCCCCGCCAAAATCACCAACCACCTGGTGGCGATGATTGAAAAAACCATTAGCGGCCAGGATGCTTTACCCAATATCAGCGATGCCGAACGTAT
 TTTTGCCGAACTTTTGACGGGACTCGCCGCCGCCCAGCCGGGGTTCCCGCTGGCGCAATTGAAAACTTTCGTCGATCAGGAATTTGCCCAAATAAAACAT
 GTCCTGCATGGCATTAGTTTGTTGGGGCAGTGCCCGGATAGCATCAACGCTGCGCTGATTTGCCGTGGCGAGAAAATGTCGATCGCCATTATGGCCGGCG
+```
 
 
-3. The third file is '[output_file_name].faa", which lists amino acid sequences corresponding to the putative genes in "[output_file_name].out". For example,
+* The third file is '[output_file_name].faa", which lists amino acid sequences corresponding to the putative genes in "[output_file_name].out". For example,
 
+```
 >gi|49175990|ref|NC_000913.2| Escherichia coli str. K-12 substr. MG1655, complete genome start=108 e
 nd=338 strand=-
 VVTSLPLVEKKSPHCQVRAFFCVSCTRQPAPLPVVMVMVVVMVVLMRFMDVVYSVIFICLCAMPILVKVFSDLSQ
@@ -150,3 +152,4 @@ VKVYAPASSANMSVGFDVLGAAVTPVDGALLGDVVTVEAAETFSLNNLGRFADKLPSEPRENIVYQCWERFCQELGKQIP
 SVVAALMAMNEHCGKPLNDTRLLALMGELEGRISGSIHYDNVAPCFLGGMQLMIEENDIISQQVPGFDEWLWVLAYPGIKVSTAEARAILPAQYRRQDCI
 AHGRHLAGFIHACYSRQPELAAKLMKDVIAEPYRERLLPGFRQARQAVAEIGAVASGISGSGPTLFALCDKPETAQRVADWLGKNYLQNQEGFVHICRLD
 TAGARVLEN
+```
