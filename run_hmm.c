@@ -217,43 +217,20 @@ void initializeSemaphores() {
 
 #ifdef __APPLE__
     sem_unlink("/work_sema");
-    if ((work_sema = sem_open("/work_sema", O_CREAT, 0644, 1)) == SEM_FAILED) {
-        perror("ERROR: sem_open");
-        exit(EXIT_FAILURE);
-    }
-
     sem_unlink("/sema_Q");
-    if (( sema_Q = sem_open("/sema_Q", O_CREAT, 0644, 1))== SEM_FAILED ) {
-        perror("ERROR: sem_open");
-        exit(EXIT_FAILURE);
-    }
-
     sem_unlink("/sema_R");
-    if (( sema_R = sem_open("/sema_R", O_CREAT, 0644, 1)) == SEM_FAILED ) {
-        perror("ERROR: sem_open");
-        exit(EXIT_FAILURE);
-    }
-
     sem_unlink("/sema_r");
-    if (( sema_r = sem_open("/sema_r", O_CREAT, 0644, 0)) == SEM_FAILED ) {
-        perror("sem_open");
-        exit(EXIT_FAILURE);
-    }
-
     sem_unlink("/sema_w");
-    if (( sema_w = sem_open("/sema_w", O_CREAT, 0644, 0)) == SEM_FAILED ) {
-        perror("sem_open");
-        exit(EXIT_FAILURE);
-    }
-
     sem_unlink("/stop_sema");
-    if (( stop_sema = sem_open("/stop_sema", O_CREAT, 0644, 0)) == SEM_FAILED ) {
-        perror("ERROR: sem_open");
-        exit(EXIT_FAILURE);
-    }
-
     sem_unlink("/COUNTER_SEMA");
-    if (( counter_sema = sem_open("/COUNTER_SEMA", O_CREAT, 0644, 1)) == SEM_FAILED ) {
+
+    if ((work_sema = sem_open("/work_sema", O_CREAT, 0644, 1)) == SEM_FAILED ||
+            (sema_Q = sem_open("/sema_Q", O_CREAT, 0644, 1)) == SEM_FAILED ||
+            (sema_R = sem_open("/sema_R", O_CREAT, 0644, 1)) == SEM_FAILED ||
+            (sema_r = sem_open("/sema_r", O_CREAT, 0644, 1)) == SEM_FAILED ||
+            (sema_w = sem_open("/sema_w", O_CREAT, 0644, 1)) == SEM_FAILED ||
+            (stop_sema = sem_open("/stop_sema", O_CREAT, 0644, 1)) == SEM_FAILED ||
+            (counter_sema = sem_open("/COUNTER_SEMA", O_CREAT, 0644, 1)) == SEM_FAILED) {
         perror("ERROR: sem_open");
         exit(EXIT_FAILURE);
     }
@@ -334,7 +311,6 @@ void initializeThreads() {
         printf("INFO : Giving workers initial inputs...\n");
 
     int i,j;
-    void *status;
     for (j = 0; j < threadnum; j++)
         pthread_create(&thread[j], 0, workerThread, (void *)(thread_datas+j));
 
@@ -424,11 +400,10 @@ int read_seq_into_buffer(FASTAFILE *ffp, thread_data *thread_data, unsigned int 
 
     char *seq;
     char *name;
-    int   L;
-    int status ;
+    int L;
     int count=0;
 
-    while ( (count < MAX_SEQS_PER_BUFFER) && (status = ReadFASTA(ffp, &seq, &name, &L)) ==1 ) {
+    while ((count < MAX_SEQS_PER_BUFFER) && ReadFASTA(ffp, &seq, &name, &L)) {
         strcpy(thread_data->input_head_buffer[buf][count], name);
         strcpy(thread_data->input_buffer[buf][count], seq);
         read_counter++;
@@ -569,15 +544,15 @@ void init_thread_data(thread_data *td) {
 }
 
 void writeOutputFiles(FILE *aa_outfile_fp, thread_data *td, unsigned int buffer) {
-    if (output_meta) {
+    if (output_meta)
         writeMeta();
-    }
-    if (output_dna) {
+    if (output_dna)
         writeDNA();
-    }
+
     writeAminoAcids(aa_outfile_fp, td, buffer);
     num_writes++;
-    if (verbose) printf("INFO: Wrote results for thread %d, buffer %d.\n", td->id, buffer );
+    if (verbose)
+        printf("INFO: Wrote results for thread %d, buffer %d.\n", td->id, buffer );
 }
 
 void writeDNA() {
@@ -597,8 +572,8 @@ void writeMeta() {
 }
 
 void writeAminoAcids(FILE *aa_outfile_fp, thread_data *td, unsigned int buffer) {
-
     int j;
+
     for (j = 0; j < td->output_num_sequences[buffer]; j++) {
         writer_counter++;
         char *ptrc;
@@ -619,14 +594,9 @@ void writeAminoAcids(FILE *aa_outfile_fp, thread_data *td, unsigned int buffer) 
 }
 
 FILE *openFilePointers() {
-
     FILE *aa_outfile_fp;
-    if (strcmp(out_file, "stdout") == 0) {
-        aa_outfile_fp = stdout;
-    } else {
-        aa_outfile_fp = fopen(aa_file, "a");
-    }
 
+    aa_outfile_fp = (strcmp(out_file, "stdout") == 0)? stdout : fopen(aa_file, "a");
     if (!aa_outfile_fp) {
         printf("ERROR: Could not open aa output file %s for writing!\n", aa_file);
         exit(EXIT_FAILURE);
@@ -638,8 +608,10 @@ FILE *openFilePointers() {
 void closeFilePointers( FILE **aa_outfile_fp, FILE **outfile_fp, FILE **dna_outfile_fp ) {
 
     fclose(*aa_outfile_fp);
-    if (output_meta) fclose(*outfile_fp);
-    if (output_dna) fclose(*dna_outfile_fp);
+    if (output_meta)
+        fclose(*outfile_fp);
+    if (output_dna)
+        fclose(*dna_outfile_fp);
 
     *aa_outfile_fp = NULL;
     *outfile_fp = NULL;
