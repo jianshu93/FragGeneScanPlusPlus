@@ -9,11 +9,11 @@
 
 unsigned int ids; // thread id
 unsigned int threadnum = 1;
-unsigned int format;
-unsigned int wholegenome;
-unsigned int output_dna;
-unsigned int output_meta;
-unsigned int verbose;
+bool format = false;
+bool wholegenome = false;
+bool output_dna = false;
+bool output_meta = false;
+bool verbose = false;
 unsigned int MAX_BYTES_PER_BUFFER;
 unsigned int MAX_SEQS_PER_BUFFER;
 unsigned int num_reads_flag = 0;
@@ -108,16 +108,16 @@ void parseArguments(int argc, char **argv) {
             }
             break;
         case 'f':
-            format = 1;
+            format = true;
             break;
         case 'd':
-            output_dna = 1;
+            output_dna = true;
             break;
         case 'e':
-            output_meta = 1;
+            output_meta = true;
             break;
         case 'v':
-            verbose = 1;
+            verbose = true;
             break;
         }
     }

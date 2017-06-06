@@ -2,20 +2,17 @@
 #define __HMM_H
 
 #include <ctype.h>
-#include <unistd.h>
-#include <string.h>
-#include <pthread.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <signal.h>
-#include <semaphore.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
 #include <ctype.h>
+#include <fcntl.h>
+#include <math.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include "fasta.h" // STRINGLEN 
 
 #define DONE_Q 0
@@ -157,8 +154,8 @@ typedef struct {
 } TRAIN;
 
 typedef struct thread_data {
-    unsigned int wholegenome;
-    unsigned int format;
+    bool wholegenome;
+    bool format;
     HMM *hmm;
 
     unsigned int *output_num_sequences;
@@ -201,7 +198,7 @@ void get_prob_from_cg(HMM *hmm, TRAIN *train, char *O, int len_seq);
 void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mfilename1, char *nfilename,
                          char *sfilename,char *pfilename,char *s1filename,char *p1filename, char *dfilename, TRAIN *train_ptr);
 void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer, char *dna_buffer,
-             char *sequence_head, int whole_genome, int format, int len_seq,
+             char *sequence_head, bool whole_genome, bool format, int len_seq,
              char* dna_ptr, char* dna1_ptr, char* dna_f_ptr, char* dna_f1_ptr, char* protein_ptr,
              int* insert_ptr, int* c_delete_ptr, char* temp_str_ptr);
 
@@ -214,7 +211,7 @@ void print_usage();
 void free_thread_data(thread_data* td);
 void print_outputs(int codon_start, int start_t, int end_t, int frame, char* output_buffer, char* aa_buffer,
                    char* dna_buffer, char* sequence_head_short, char* dna, char* dna1, char* dna_f, char* dna_f1,
-                   char* protein, int* insert, int* c_delete, int insert_id, int delete_id, int format, char* temp_str_ptr, unsigned int multiple);
+                   char* protein, int* insert, int* c_delete, int insert_id, int delete_id, bool format, char* temp_str_ptr, unsigned int multiple);
 
 // helper functions to cleanup the main function
 void setTrainDirectory(char* train_path);

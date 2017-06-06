@@ -1,9 +1,9 @@
 #ifndef __UTIL_LIB_H
 #define __UTIL_LIB_H
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "hmm.h"
 
 double **dmatrix(int num_col);
