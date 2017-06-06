@@ -13,7 +13,6 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     int from2;             /* from2: i-2, i-1 for condition in probability */
     int gene_len;
     int num_d;          		/* the number of delete */
-    int freq_id;
     double h_kd, r_kd, p_kd;
     double temp_alpha, prob;
     double start_freq;
@@ -491,10 +490,8 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
                 /* adjustment based on probability distribution */
                 start_freq=0;
-                freq_id = 0;
 
                 double sub_sum = 0;
-                int sub_count = 0;
 
                 if (t>=60) { /* bug reported by Yu-Wei */
                     for (i = -60; i <= -3; i++) {
@@ -571,7 +568,6 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
                 /* adjustment based on probability distribution */
                 start_freq=0;
-                freq_id = 0;
                 for (i = 3; i <= 60; i++) {
                     if (t+i+2 < len_seq) {
                         start_freq -= (hmm_ptr->tr_S_1[i-3][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
@@ -630,10 +626,8 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
                 /* adjustment based on probability distribution */
                 start_freq=0;
-                freq_id = 0;
 
                 double sub_sum = 0;
-                int sub_count = 0;
 
                 if (t>=30) {
                     for (i = -30; i <= 30; i++) {
@@ -694,10 +688,8 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
                 /* adjustment based on probability distribution */
                 start_freq=0;
-                freq_id = 0;
 
                 double sub_sum = 0;
-                int sub_count = 0;
 
                 if (t>=30) {
                     for (i = -30; i <= 30; i++) {
