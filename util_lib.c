@@ -5,17 +5,17 @@
 #include "util_lib.h"
 
 // which corresponds to either 0 (done) or 1 (empty) buffer
-void enqueue(thread_data* td, unsigned int buffer, unsigned int which) {
+void enqueue(thread_data *td, unsigned int buffer, unsigned int which) {
 
-    QUEUE* item = (QUEUE*) malloc(sizeof(QUEUE));
+    QUEUE *item = (QUEUE *) malloc(sizeof(QUEUE));
     item->td = td;
     item->buffer = buffer;
     item->next = 0;
 
-    QUEUE** head = 0;
-    QUEUE** tail = 0;
+    QUEUE **head = 0;
+    QUEUE **tail = 0;
 
-    if(which) {
+    if (which) {
         head = &q_empty_head;
         tail = &q_empty_tail;
     } else {
@@ -24,7 +24,7 @@ void enqueue(thread_data* td, unsigned int buffer, unsigned int which) {
     }
 
 //    printf("INSIDE ENQ, head %d tail %d\n", *head, *tail);
-    if(!*head) {
+    if (!*head) {
         *head = item;
         *tail = item;
     } else {
@@ -34,13 +34,13 @@ void enqueue(thread_data* td, unsigned int buffer, unsigned int which) {
 }
 
 void printq(unsigned int which) {
-    QUEUE* head;
+    QUEUE *head;
 
-    if(which) head = q_empty_head;
+    if (which) head = q_empty_head;
     else head = q_done_head;
 
 //    printf("QUEUE %d head %d\n", which, head);
-    while(head) {
+    while (head) {
         printf("QUEUE %d has id %d buffer %d\n", which, head->td->id, head->buffer);
         head = head->next;
     }
@@ -48,31 +48,31 @@ void printq(unsigned int which) {
 }
 
 // which corresponds to either 0 (done) or 1 (empty) buffer
-QUEUE* deq(unsigned int which) {
+QUEUE *deq(unsigned int which) {
 
-    QUEUE** head = 0;
-    if(which) head = &q_empty_head;
+    QUEUE **head = 0;
+    if (which) head = &q_empty_head;
     else head = &q_done_head;
 
     if (!*head) return 0;
 
-    QUEUE* temp = *head;
+    QUEUE *temp = *head;
     *head = (*head)->next;
     return temp;
 }
 
 // which corresponds to either 0 (done) or 1 (empty) buffer
-void cutnpaste_q(QUEUE** dest, unsigned int which) {
+void cutnpaste_q(QUEUE **dest, unsigned int which) {
 
-    QUEUE** head = 0;
+    QUEUE **head = 0;
 
-    if(which) {
+    if (which) {
         head = &q_empty_head;
     } else {
         head = &q_done_head;
     }
 
-    if(!*head) {
+    if (!*head) {
         *dest = 0;
         return;
     }
@@ -81,20 +81,20 @@ void cutnpaste_q(QUEUE** dest, unsigned int which) {
     *head = 0;
 }
 
-double** dmatrix(int num_col) {
+double **dmatrix(int num_col) {
 
     // NUM_STATE = NUM_STATE. This is the viterbi score matrix for this sequence.
 
     int i, j;
     double **m;
 
-    m = calloc(NUM_STATE, sizeof(double*));
+    m = calloc(NUM_STATE, sizeof(double *));
     if (!m) {
         fprintf(stderr, "%s\n", "ERROR: Allocation failure for points to rows in dmatrix()");
         exit(EXIT_FAILURE);
     }
 
-    for(i=0; i < NUM_STATE; i++) {
+    for (i=0; i < NUM_STATE; i++) {
         m[i] = calloc(num_col, sizeof(double));
         if (!m[i]) {
             fprintf(stderr, "%s %d %s\n", "ERROR: Allocation failure for the row ", i, " in dmatrix()");
@@ -105,20 +105,20 @@ double** dmatrix(int num_col) {
 }
 
 
-int** imatrix(int num_col) {
+int **imatrix(int num_col) {
 
     // NUM_STATE = NUM_STATE. This is the viterbi score matrix for this sequence.
 
     int i, j;
     int **m;
 
-    m = calloc(NUM_STATE, sizeof(int*));
+    m = calloc(NUM_STATE, sizeof(int *));
     if (!m) {
         fprintf(stderr, "%s\n", "ERROR: Allocation failure for points to rows in imatrix()");
         exit(EXIT_FAILURE);
     }
 
-    for(i=0; i < NUM_STATE; i++) {
+    for (i=0; i < NUM_STATE; i++) {
         m[i] = calloc(num_col, sizeof(int));
         if (!m[i]) {
             fprintf(stderr, "%s %d %s\n", "ERROR: Allocation failure for the row ", i ," in imatrix()");
@@ -128,7 +128,7 @@ int** imatrix(int num_col) {
     return m;
 }
 
-int* ivector(int nh) {
+int *ivector(int nh) {
 
     int j;
     int *v;
@@ -140,7 +140,7 @@ int* ivector(int nh) {
         exit(EXIT_FAILURE);
     }
 
-    for(j=0; j<nh; j++) {
+    for (j=0; j<nh; j++) {
         v[j] = 0;
     }
     return v;
@@ -150,7 +150,7 @@ void free_dmatrix(double **m) {
 
     int i;
 
-    for(i=NUM_STATE-1; i>=0; i--) {
+    for (i=NUM_STATE-1; i>=0; i--) {
         free(m[i]);
         m[i] = 0;
     }
@@ -163,7 +163,7 @@ void free_imatrix(int **m) {
 
     int i;
 
-    for(i=NUM_STATE-1; i>=0; i--) {
+    for (i=NUM_STATE-1; i>=0; i--) {
         free(m[i]);
         m[i] = 0;
     }
@@ -488,10 +488,10 @@ void print_usage() {
 
 }
 
-void stopMemset(char* ptr, int length) {
+void stopMemset(char *ptr, int length) {
     int i;
-    for(i=0; i<length; i++) {
-        if(ptr[i] == '\0') {
+    for (i=0; i<length; i++) {
+        if (ptr[i] == '\0') {
             return;
         }
         ptr[i] = '\0';

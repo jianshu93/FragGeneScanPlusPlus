@@ -1,9 +1,9 @@
 #include "util_lib.h"
 
-void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
+void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
              char *dna_buffer, char *sequence_head, int whole_genome, int format,
-             int len_seq, char* dna, char* dna1, char* dna_f, char* dna_f1,
-             char* protein, int* insert, int* c_delete, char* temp_str_ptr) {
+             int len_seq, char *dna, char *dna1, char *dna_f, char *dna_f1,
+             char *protein, int *insert, int *c_delete, char *temp_str_ptr) {
 
     int *vpath;                          // optimal path after backtracking
     int **path;                          // viterbi path array
@@ -37,11 +37,11 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
     /* initialize                                                  */
     /***************************************************************/
 
-    for(i =0; i < strlen(O); i++) {
-        if( O[i]=='a' ) O[i]='A';
-        if( O[i]=='t' ) O[i]='T';
-        if( O[i]=='c' ) O[i]='C';
-        if( O[i]=='g' ) O[i]='G';
+    for (i =0; i < strlen(O); i++) {
+        if ( O[i]=='a' ) O[i]='A';
+        if ( O[i]=='t' ) O[i]='T';
+        if ( O[i]=='c' ) O[i]='C';
+        if ( O[i]=='g' ) O[i]='G';
     }
 
     if (whole_genome==1) {
@@ -157,7 +157,7 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
                                 } else {
                                     num_d = -10;
                                 }
-                                if(num_d>0) {
+                                if (num_d>0) {
                                     temp_alpha = alpha[j][t-1] - (hmm_ptr->tr[TR_MD]) -
                                                  (hmm_ptr->e_M[0][from2][to])
                                                  - LOG_25*(num_d-1) - (hmm_ptr->tr[TR_DD])*(num_d-2) -
@@ -222,10 +222,10 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
 
                     /* to aviod stop codon */
                     if (t<2) {
-                    } else if((i==M2_STATE || i==M5_STATE) && (O[temp_i[j-I1_STATE]] == 'T') &&
-                              (((O[t] == 'A') && (O[t+1] =='A')) ||
-                               ((O[t] == 'A') && (O[t+1] =='G')) ||
-                               ((O[t] == 'G') && (O[t+1] =='A')))) {
+                    } else if ((i==M2_STATE || i==M5_STATE) && (O[temp_i[j-I1_STATE]] == 'T') &&
+                               (((O[t] == 'A') && (O[t+1] =='A')) ||
+                                ((O[t] == 'A') && (O[t+1] =='G')) ||
+                                ((O[t] == 'G') && (O[t+1] =='A')))) {
 
                     } else if (((j-I1_STATE > 0) && (temp_i[j-I1_STATE]>0)) && ((i==M3_STATE || i==M6_STATE) && (O[temp_i[j-I1_STATE]-1] == 'T') &&
                                (((O[temp_i[j-I1_STATE]] == 'A') && (O[t] =='A')) ||
@@ -370,12 +370,12 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
 
                     /* to aviod stop codon */
                     if (t<2) {
-                    } else  if((i==M2_STATE_1 ||
-                                i==M5_STATE_1) &&
-                               (O[t+1] == 'A' ) &&
-                               (((O[temp_i_1[j-I1_STATE_1]] == 'T') && (O[t] =='T')) ||
-                                ((O[temp_i_1[j-I1_STATE_1]] == 'C') && (O[t] =='T')) ||
-                                ((O[temp_i_1[j-I1_STATE_1]] == 'T') && (O[t] =='C')))) {
+                    } else  if ((i==M2_STATE_1 ||
+                                 i==M5_STATE_1) &&
+                                (O[t+1] == 'A' ) &&
+                                (((O[temp_i_1[j-I1_STATE_1]] == 'T') && (O[t] =='T')) ||
+                                 ((O[temp_i_1[j-I1_STATE_1]] == 'C') && (O[t] =='T')) ||
+                                 ((O[temp_i_1[j-I1_STATE_1]] == 'T') && (O[t] =='C')))) {
 
                     } else if ((i==M3_STATE_1 ||
                                 i==M6_STATE_1) &&
@@ -407,7 +407,7 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
                               (hmm_ptr->tr_I_I[from][to]);
                 path[i][t] = j;
 
-                if(t<5) continue;
+                if (t<5) continue;
                 /* from M state */
                 if (path[S_STATE_1][t-3]!= R_STATE && path[S_STATE_1][t-4] !=R_STATE &&
                         path[S_STATE_1][t-5] !=R_STATE) {
@@ -496,7 +496,7 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
                     alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - (0.54);
                 } else if ((O[t+1] == 'A') && (O[t+2] == 'G')) {
                     alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - LOG_16;
-                } else if((O[t+1] == 'G') && (O[t+2] == 'A')) {
+                } else if ((O[t+1] == 'G') && (O[t+2] == 'A')) {
                     alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - LOG_30;
                 }
 
@@ -508,13 +508,13 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
                 int sub_count = 0;
 
                 if (t>=60) { /* bug reported by Yu-Wei */
-                    for(i=-60; i<=-3; i++) {
+                    for (i=-60; i<=-3; i++) {
                         if (t+i+2 < len_seq) {
                             start_freq -= (hmm_ptr->tr_E[i+60][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                         }
                     }
                 } else {
-                    for(i=(-1*t); i<=-3; i++) {
+                    for (i=(-1*t); i<=-3; i++) {
                         if (t+i+2 < len_seq) {
                             sub_sum += (hmm_ptr->tr_E[i+60][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                         }
@@ -576,14 +576,14 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
                     alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - (0.54);
                 } else if ((O[t] == 'C') && (O[t+1] == 'T')) {
                     alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - LOG_16;
-                } else if((O[t] == 'T') && (O[t+1] == 'C')) {
+                } else if ((O[t] == 'T') && (O[t+1] == 'C')) {
                     alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - LOG_30;
                 }
 
                 /* adjustment based on probability distribution */
                 start_freq=0;
                 freq_id = 0;
-                for(i=3; i<=60; i++) {
+                for (i=3; i<=60; i++) {
                     if (t+i+2 < len_seq) {
                         start_freq -= (hmm_ptr->tr_S_1[i-3][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                     }
@@ -635,7 +635,7 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
                     alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - LOG_83;
                 } else if (O[t] == 'G') {
                     alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - LOG_10;
-                } else if(O[t] == 'T') {
+                } else if (O[t] == 'T') {
                     alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - LOG_07;
                 }
 
@@ -647,13 +647,13 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
                 int sub_count = 0;
 
                 if (t>=30) {
-                    for(i=-30; i<=30; i++) {
+                    for (i=-30; i<=30; i++) {
                         if (t+i+2 < len_seq) {
                             start_freq -= (hmm_ptr->tr_S[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                         }
                     }
                 } else {
-                    for(i=(-1*t); i<=30; i++) {
+                    for (i=(-1*t); i<=30; i++) {
                         if (t+i+2 < len_seq) {
                             sub_sum += (hmm_ptr->tr_S[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                         }
@@ -699,7 +699,7 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
                     alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - LOG_83;
                 } else if (O[t+2] == 'C' ) {
                     alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - LOG_10;
-                } else if(O[t+2] == 'A' ) {
+                } else if (O[t+2] == 'A' ) {
                     alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - LOG_07;
                 }
 
@@ -711,13 +711,13 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
                 int sub_count = 0;
 
                 if (t>=30) {
-                    for(i=-30; i<=30; i++) {
+                    for (i=-30; i<=30; i++) {
                         if (t+i+2 < len_seq) {
                             start_freq -= (hmm_ptr->tr_E_1[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                         }
                     }
                 } else {
-                    for(i=(-1*t); i<=30; i++) {
+                    for (i=(-1*t); i<=30; i++) {
                         if (t+i+2 < len_seq) {
                             sub_sum += (hmm_ptr->tr_E_1[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
                         }
@@ -774,8 +774,8 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
     }
 
     /* backtrack the opitmal path */
-    for(t=len_seq-2; t>=0; t--) {
-        if(t+1 < 0 || vpath[t+1] < 0) continue;
+    for (t=len_seq-2; t>=0; t--) {
+        if (t+1 < 0 || vpath[t+1] < 0) continue;
         vpath[t] = path[vpath[t+1]][t+1];
     }
 
@@ -824,7 +824,7 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer,
 
                 /* FGS1.12 start: remove incomplete codon */
                 int temp_t = t;
-                while(vpath[temp_t] != M1_STATE && vpath[temp_t] != M4_STATE  &&
+                while (vpath[temp_t] != M1_STATE && vpath[temp_t] != M4_STATE  &&
                         vpath[temp_t] != M1_STATE_1  && vpath[temp_t] != M4_STATE_1) {
                     dna_f[dna_f_id] = '\0';
                     dna_f_id--;
@@ -1131,9 +1131,9 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
 
 }
 
-void print_outputs(int codon_start, int start_t, int end_t, int frame, char* output_buffer, char* aa_buffer, char* dna_buffer,
-                   char* sequence_head_short, char* dna, char* dna1, char* dna_f, char* dna_f1, char* protein,
-                   int* insert, int* c_delete, int insert_id, int delete_id, int format, char* temp_str_ptr, unsigned int multiple) {
+void print_outputs(int codon_start, int start_t, int end_t, int frame, char *output_buffer, char *aa_buffer, char *dna_buffer,
+                   char *sequence_head_short, char *dna, char *dna1, char *dna_f, char *dna_f1, char *protein,
+                   int *insert, int *c_delete, int insert_id, int delete_id, int format, char *temp_str_ptr, unsigned int multiple) {
 
     int i;
     char tab[] = "\t";
@@ -1168,7 +1168,7 @@ void print_outputs(int codon_start, int start_t, int end_t, int frame, char* out
 
         sprintf(temp_str_ptr, "%s_%d_%d_+\n", sequence_head_short, start_t, end_t);
 
-        if(multiple)  strcat(aa_buffer, tab);
+        if (multiple)  strcat(aa_buffer, tab);
 
         strcat(aa_buffer, temp_str_ptr);
 
@@ -1210,7 +1210,7 @@ void print_outputs(int codon_start, int start_t, int end_t, int frame, char* out
 
         sprintf(temp_str_ptr, "%s_%d_%d_-\n", sequence_head_short, start_t, end_t);
 
-        if(multiple)  strcat(aa_buffer, tab);
+        if (multiple)  strcat(aa_buffer, tab);
         strcat(aa_buffer, temp_str_ptr);
 
 
@@ -1249,7 +1249,7 @@ void print_outputs(int codon_start, int start_t, int end_t, int frame, char* out
         get_rc_dna(dna, dna1);
         get_rc_dna_indel(dna_f, dna_f1);
         sprintf(temp_str_ptr, "%s\n", protein);
-        if(multiple)  strcat(aa_buffer, tab);
+        if (multiple)  strcat(aa_buffer, tab);
         strcat(aa_buffer, temp_str_ptr);
 
         if (format == 0) {

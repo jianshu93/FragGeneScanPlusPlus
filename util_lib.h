@@ -22,23 +22,23 @@ void get_protein(char *dna, char *protein, int strand);
 void print_usage();
 
 typedef struct q {
-    struct q* next;
-    thread_data* td;
+    struct q *next;
+    thread_data *td;
     unsigned int buffer;
 } QUEUE;
 
-QUEUE* q_empty_head;
-QUEUE* q_empty_tail;
-QUEUE* q_done_head;
-QUEUE* q_done_tail;
+QUEUE *q_empty_head;
+QUEUE *q_empty_tail;
+QUEUE *q_done_head;
+QUEUE *q_done_tail;
 
 
 void printq(unsigned int which);
-void enq(thread_data* td, unsigned int buffer, unsigned int which);
-QUEUE* deq(unsigned int which);
+void enq(thread_data *td, unsigned int buffer, unsigned int which);
+QUEUE *deq(unsigned int which);
 
-void cutnpaste_q(QUEUE** dest, unsigned int which);
+void cutnpaste_q(QUEUE **dest, unsigned int which);
 
-void stopMemset(char* ptr, int length);
+void stopMemset(char *ptr, int length);
 
 #endif

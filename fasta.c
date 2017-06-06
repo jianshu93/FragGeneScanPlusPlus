@@ -97,12 +97,12 @@
 *
 *           CloseFASTA() "always succeeds" and returns void.
 */
-FASTAFILE * OpenFASTA(char *seqfile) {
+FASTAFILE *OpenFASTA(char *seqfile) {
 
     FASTAFILE *ffp;
     ffp = malloc(sizeof(FASTAFILE));
 
-    if(strcmp(seqfile, "stdin") == 0) {
+    if (strcmp(seqfile, "stdin") == 0) {
         ffp->fp = stdin;
     } else {
         ffp->fp = fopen(seqfile, "r");              /* Assume seqfile exists & readable!   */
@@ -135,7 +135,7 @@ ReadFASTA(FASTAFILE *ffp, char **ret_seq, char **ret_name, int *ret_L) {
     */
     s  = strtok(ffp->buffer+1, " \t\n");
     //name = malloc(sizeof(char) * (strlen(s)+1));
-    if( name==0)
+    if ( name==0)
         name = malloc(sizeof(char) * 1024);
     strcpy(name, s);
 
@@ -144,7 +144,7 @@ ReadFASTA(FASTAFILE *ffp, char **ret_seq, char **ret_name, int *ret_L) {
      * read more characters, so we don't have to assume a maximum
      * sequence length.
      */
-    if( seq==0)
+    if ( seq==0)
         seq = malloc(sizeof(char) * 1024);     /* allocate seq in blocks of 128 residues */
     nalloc = 128;
     n = 0;

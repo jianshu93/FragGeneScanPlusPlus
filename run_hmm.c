@@ -36,13 +36,13 @@ SEM_T work_sema;
 SEM_T stop_sema;
 SEM_T counter_sema;
 
-FILE* outfile_fp;
-FILE* dna_outfile_fp;
+FILE *outfile_fp;
+FILE *dna_outfile_fp;
 
 char mystring[STRINGLEN];
 char complete_sequence[STRINGLEN];
 
-FASTAFILE* fp;
+FASTAFILE *fp;
 
 void parseArguments(int argc, char **argv) {
     /* read command line argument */
@@ -60,7 +60,7 @@ void parseArguments(int argc, char **argv) {
         case 's':
             strcpy(seq_file, optarg);
 
-            if(strcmp(seq_file, "stdin") == 0) {
+            if (strcmp(seq_file, "stdin") == 0) {
                 break;
             } else if (access(seq_file, F_OK)==-1) {
                 fprintf(stderr, "ERROR: Sequence file [%s] does not exist\n", seq_file);
@@ -192,7 +192,7 @@ void checkOutputFiles() {
     if (output_dna) remove(dna_file);
 }
 
-void setTrainDirectory(char* train_path) {
+void setTrainDirectory(char *train_path) {
     strcpy(train_dir, train_path);
     strcat(train_dir, "/");
     strcpy(mstate_file, train_dir);
@@ -282,7 +282,7 @@ void destroySemaphores() {
 
     char name[40];
     int j;
-    for(j=0; j<threadnum; j++) {
+    for (j=0; j<threadnum; j++) {
         sprintf(name, "/sema_r%d", j);
         sem_unlink(name);
 
@@ -304,7 +304,7 @@ void destroySemaphores() {
 
 void initializeThreads() {
 
-    pthread_t *thread = calloc(threadnum, sizeof(pthread_t*));
+    pthread_t *thread = calloc(threadnum, sizeof(pthread_t *));
     thread_datas = malloc(sizeof(thread_data) * threadnum);
 
     // allocate memory for each thread only once!
@@ -312,7 +312,7 @@ void initializeThreads() {
         printf("DEBUG: Allocating memory for all threads...\n");
 
     int k;
-    for(k=0; k< threadnum; k++) {
+    for (k=0; k< threadnum; k++) {
         init_thread_data(thread_datas+k);
     }
 
@@ -335,12 +335,12 @@ void initializeThreads() {
 
     int i,j;
     void *status;
-    for(j=0; j<threadnum; j++)
+    for (j=0; j<threadnum; j++)
         pthread_create(&thread[j], 0, workerThread, (void *)(thread_datas+j));
 
-    for(j=0; j<threadnum; j++) {
-        for(i=0; i<2; i++) {
-            if( (stopped_at_fpos = read_seq_into_buffer(fp, thread_datas + j, i))!=0) {
+    for (j=0; j<threadnum; j++) {
+        for (i=0; i<2; i++) {
+            if ( (stopped_at_fpos = read_seq_into_buffer(fp, thread_datas + j, i))!=0) {
                 sem_post(thread_datas[j].sema_r);
             }
         }
@@ -357,15 +357,15 @@ void readerThread() {
         sem_wait(sema_r);
 
         sem_wait(sema_Q);
-        QUEUE* temp;
+        QUEUE *temp;
         cutnpaste_q(&temp, EMPTY_Q);
         sem_post(sema_Q);
 
-        while(temp) {
+        while (temp) {
             sem_wait(sema_R);
             stopped_at_fpos = read_seq_into_buffer(fp,  temp->td, temp->buffer);
 
-            if(stopped_at_fpos == 0) {
+            if (stopped_at_fpos == 0) {
                 num_reads_flag =1;
             }
 
@@ -420,7 +420,7 @@ int main (int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
-int read_seq_into_buffer(FASTAFILE* ffp, thread_data* thread_data, unsigned int buf) {
+int read_seq_into_buffer(FASTAFILE *ffp, thread_data *thread_data, unsigned int buf) {
 
     char *seq;
     char *name;
@@ -444,7 +444,7 @@ int read_seq_into_buffer(FASTAFILE* ffp, thread_data* thread_data, unsigned int 
 
 // read as much of the file as you can into the buffer, return the file position
 // of the last carat character encountered before the memory limit was hit
-off_t read_file_into_buffer(FILE* fp, int fpos, thread_data* thread_data, unsigned int buf) {
+off_t read_file_into_buffer(FILE *fp, int fpos, thread_data *thread_data, unsigned int buf) {
 
     int i = 0; // temp length of each sequence
     long count = 0; // index for the number of sequences
@@ -474,7 +474,7 @@ off_t read_file_into_buffer(FILE* fp, int fpos, thread_data* thread_data, unsign
         } else {
             strcat(complete_sequence, mystring);
             seq_length = strlen(mystring);
-            while(mystring[seq_length-1] == 10 || mystring[seq_length-1]==13 || mystring[seq_length-1]==0) {
+            while (mystring[seq_length-1] == 10 || mystring[seq_length-1]==13 || mystring[seq_length-1]==0) {
                 seq_length --;
             }
             i += seq_length;
@@ -487,7 +487,7 @@ off_t read_file_into_buffer(FILE* fp, int fpos, thread_data* thread_data, unsign
 
     if (ferror(fp)) {
         printf("Error with file encountered.\n");
-    } else if(feof(fp)) {
+    } else if (feof(fp)) {
         last_carat_position = -1; // terminating condition
     }
     num_reads++;
@@ -496,7 +496,7 @@ off_t read_file_into_buffer(FILE* fp, int fpos, thread_data* thread_data, unsign
 }
 
 
-void init_thread_data(thread_data* td) {
+void init_thread_data(thread_data *td) {
     // Initialize thread data structure
 
     td->hmm = calloc(1, sizeof(HMM));
@@ -512,7 +512,7 @@ void init_thread_data(thread_data* td) {
     sprintf(name, "/sema_r%d", td->id);
     sem_unlink(name);
 
-    if((td->sema_r = sem_open(name, O_CREAT, 0644, 0)) == SEM_FAILED ) {
+    if ((td->sema_r = sem_open(name, O_CREAT, 0644, 0)) == SEM_FAILED ) {
         perror("sem_open");
         exit(EXIT_FAILURE);
     }
@@ -533,11 +533,11 @@ void init_thread_data(thread_data* td) {
     td->output_num_sequences = calloc(2, sizeof(int));
     td->input_num_sequences = calloc(2, sizeof(int));
 
-    td->input_buffer = (char ***)malloc(sizeof(char**) * 2);
-    td->input_head_buffer = (char ***)malloc(sizeof(char**) * 2);
-    td->output_buffer = (char ***)malloc(sizeof(char**) * 2);
-    td->aa_buffer = (char ***)malloc(sizeof(char**) * 2);
-    td->dna_buffer = (char ***)malloc(sizeof(char**) * 2);
+    td->input_buffer = (char ** *)malloc(sizeof(char **) * 2);
+    td->input_head_buffer = (char ** *)malloc(sizeof(char **) * 2);
+    td->output_buffer = (char ** *)malloc(sizeof(char **) * 2);
+    td->aa_buffer = (char ** *)malloc(sizeof(char **) * 2);
+    td->dna_buffer = (char ** *)malloc(sizeof(char **) * 2);
 
     td->dna	= calloc(STRINGLEN, sizeof(char));
     td->dna1 = calloc(STRINGLEN, sizeof(char));
@@ -551,14 +551,14 @@ void init_thread_data(thread_data* td) {
 
     int i;
     for (i=0; i<2; i++) {
-        td->input_buffer[i]	= (char **)malloc(sizeof(char*) * MAX_SEQS_PER_BUFFER);
-        td->input_head_buffer[i] = (char **)malloc(sizeof(char*) * MAX_SEQS_PER_BUFFER);
-        td->output_buffer[i]	= (char **) malloc(sizeof(char*) * MAX_SEQS_PER_BUFFER);
-        td->aa_buffer[i]	=   (char **)malloc(sizeof(char*) * MAX_SEQS_PER_BUFFER);
-        td->dna_buffer[i]	= (char **)malloc(sizeof(char*) * MAX_SEQS_PER_BUFFER);
+        td->input_buffer[i]	= (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->input_head_buffer[i] = (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->output_buffer[i]	= (char **) malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->aa_buffer[i]	=   (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->dna_buffer[i]	= (char **)malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
 
         int j;
-        for(j=0; j<MAX_SEQS_PER_BUFFER; j++) {
+        for (j=0; j<MAX_SEQS_PER_BUFFER; j++) {
             td->input_buffer[i][j] = calloc(1, STRINGLEN);
             td->input_head_buffer[i][j] = calloc(1, STRINGLEN);
             td->aa_buffer[i][j] = calloc(1, STRINGLEN);
@@ -568,7 +568,7 @@ void init_thread_data(thread_data* td) {
     }
 }
 
-void writeOutputFiles(FILE* aa_outfile_fp, thread_data* td, unsigned int buffer) {
+void writeOutputFiles(FILE *aa_outfile_fp, thread_data *td, unsigned int buffer) {
     if (output_meta) {
         writeMeta();
     }
@@ -590,22 +590,22 @@ void writeDNA() {
 
 void writeMeta() {
     outfile_fp = fopen(out_file, "a");
-    if(!outfile_fp) {
+    if (!outfile_fp) {
         printf("ERROR: Could not open meta output file %s for writing!\n", out_file);
         exit(EXIT_FAILURE);
     }
 }
 
-void writeAminoAcids(FILE* aa_outfile_fp, thread_data* td, unsigned int buffer) {
+void writeAminoAcids(FILE *aa_outfile_fp, thread_data *td, unsigned int buffer) {
 
     int j;
-    for(j = 0; j < td->output_num_sequences[buffer]; j++) {
+    for (j = 0; j < td->output_num_sequences[buffer]; j++) {
         writer_counter++;
         char *ptrc;
-        if(td->aa_buffer[buffer][j][0]!=0) {
+        if (td->aa_buffer[buffer][j][0]!=0) {
             ptrc=td->aa_buffer[buffer][j];
-            while(*ptrc!='\0') {
-                if(*ptrc=='\t') *ptrc='>';
+            while (*ptrc!='\0') {
+                if (*ptrc=='\t') *ptrc='>';
                 ptrc++;
             }
             fprintf(aa_outfile_fp, ">%s", td->aa_buffer[buffer][j]);
@@ -618,16 +618,16 @@ void writeAminoAcids(FILE* aa_outfile_fp, thread_data* td, unsigned int buffer) 
     }
 }
 
-FILE* openFilePointers() {
+FILE *openFilePointers() {
 
-    FILE* aa_outfile_fp;
-    if(strcmp(out_file, "stdout") == 0) {
+    FILE *aa_outfile_fp;
+    if (strcmp(out_file, "stdout") == 0) {
         aa_outfile_fp = stdout;
     } else {
         aa_outfile_fp = fopen(aa_file, "a");
     }
 
-    if(!aa_outfile_fp) {
+    if (!aa_outfile_fp) {
         printf("ERROR: Could not open aa output file %s for writing!\n", aa_file);
         exit(EXIT_FAILURE);
     }
@@ -635,7 +635,7 @@ FILE* openFilePointers() {
     return aa_outfile_fp;
 }
 
-void closeFilePointers( FILE** aa_outfile_fp, FILE** outfile_fp, FILE** dna_outfile_fp ) {
+void closeFilePointers( FILE **aa_outfile_fp, FILE **outfile_fp, FILE **dna_outfile_fp ) {
 
     fclose(*aa_outfile_fp);
     if (output_meta) fclose(*outfile_fp);
@@ -646,26 +646,26 @@ void closeFilePointers( FILE** aa_outfile_fp, FILE** outfile_fp, FILE** dna_outf
     *dna_outfile_fp = NULL;
 }
 
-void* writerThread(void* args) {
+void *writerThread(void *args) {
 
     int j;
-    FILE* aa_outfile_fp = openFilePointers();
+    FILE *aa_outfile_fp = openFilePointers();
 
-    while(1) {
+    while (1) {
 
         sem_wait(sema_w);
 
-        QUEUE* temp;
+        QUEUE *temp;
 
         sem_wait(sema_Q);
         cutnpaste_q(&temp, DONE_Q);
         sem_post(sema_Q);
 
-        while(temp) {
+        while (temp) {
 
             sem_wait(sema_R);
 
-            thread_data* td = temp->td;
+            thread_data *td = temp->td;
             unsigned int buffer = temp->buffer;
 
             writeOutputFiles(aa_outfile_fp, td, buffer);
@@ -709,12 +709,12 @@ void runViterbiOnBuffers(thread_data *td, unsigned int b) {
 
 }
 
-void* workerThread(void *_thread_datas) {
+void *workerThread(void *_thread_datas) {
 
-    thread_data *td = (thread_data*)_thread_datas;
+    thread_data *td = (thread_data *)_thread_datas;
     unsigned int b = 0;
 
-    while(1) {
+    while (1) {
         sem_wait(td->sema_r);
         sem_wait(td->sema_w);
 
@@ -741,5 +741,5 @@ void* workerThread(void *_thread_datas) {
         b = (b + 1) % 2;
     }
 
-    return (void*) 0;
+    return (void *) 0;
 }
