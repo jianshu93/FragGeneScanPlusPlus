@@ -1,3 +1,7 @@
+/**
+ * @file run_hmm.h
+ */
+
 #ifndef __RUN_HMM_H
 #define __RUN_HMM_H
 

@@ -5,5 +5,8 @@ out*
 *.swp
 FGS+
 
+# Documentation
+doc/
+
 # OSX files
 .DS_Store

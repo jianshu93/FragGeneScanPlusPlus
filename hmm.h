@@ -1,3 +1,9 @@
+/**
+ * @file hmm.h
+ *
+ * @brief The main header file.
+ */
+
 #ifndef __HMM_H
 #define __HMM_H
 
@@ -148,36 +154,48 @@ typedef struct {
 
 } TRAIN;
 
-typedef struct ThreadData {
+/**
+ * The data that can be used by each thread separately (without locking).
+ */
+typedef struct {
+    /** The ID for this thread, a unique number. */
+    unsigned int id;
+
+    /** The hidden Markov model that will be used in this thread. */
+    HMM *hmm;
+
     bool wholegenome;
     bool format;
-    HMM *hmm;
 
     unsigned int *output_num_sequences;
     unsigned int *input_num_sequences;
-    unsigned int  id;
 
-    /* The input records */
+    /** The FASTA headers. */
     char*** record_headers;
+    /** The FASTA nucleotide sequences. */
     char*** record_sequences;
+    /** The lengths of the FASTA nucleotide sequences. */
     int** record_sequences_lens;
 
-    // all buffers allocated by master
+    /** The outputs for printing to the meta file (with the putative gene coordinates. */
     char*** output_buffer;
+    /** The outputs for the .faa-file (with all putative genes translated). */
     char*** aa_buffer;
+    /** The outputs for the .ffn-file (with the putative genes). */
     char*** dna_buffer;
 
-    // new stuff
+    /** The predicted insertions */
+    int* insert;
+    /** The predicted deletions */
+    int* c_delete;
+
+    /* Temporary buffers */
     char* dna;
     char* dna1;
     char* dna_f;
     char* dna_f1;
     char* protein;
-    int* insert;
-    int* c_delete;
     char* temp_str;
-
-    //unsigned int** acceptable_buffer;
 
     SEM_T sema_r;
     SEM_T sema_w;
@@ -204,8 +222,8 @@ void free_hmm(HMM *hmm);
 /**
  * Translates the given DNA sequence.
  *
- * @param dna The string we want to translate.
- * @param protein The output buffer for the protein.
+ * @param dna The sequence we want to translate.
+ * @param[out] protein The output buffer for the protein.
  * @param strand What strand to translate.
  */
 void get_protein(char *dna, char *protein, int strand);
@@ -214,7 +232,7 @@ void get_protein(char *dna, char *protein, int strand);
  * Calculates the reverse-complement of given DNA
  *
  * @param dna The string we want to take the reverse-complement of.
- * @param rc_dna The output buffer for the reverse-complement.
+ * @param[out] rc_dna The output buffer for the reverse-complement.
  */
 void get_rc_dna(char *dna, char *rc_dna);
 
