@@ -44,6 +44,15 @@ char complete_sequence[STRINGLEN];
 
 FastaFile *fp;
 
+/* Macro to have easy debug messages */
+#define log_debug(...) \
+            do { \
+              if (verbose) { \
+                fprintf(stdout, "[Debug] %s (line %d):  ", __FILE__, __LINE__); \
+                fprintf(stdout, __VA_ARGS__); \
+              } \
+            } while (0)
+
 void parseArguments(int argc, char **argv) {
     /* read command line argument */
     //!! This argument reading should all be encapsulated in a single function, this will make reading the code much easier, right now we have to always move around it.
@@ -286,16 +295,13 @@ void initializeThreads() {
     thread_datas = malloc(sizeof(ThreadData) * threadnum);
 
     // allocate memory for each thread only once!
-    if (verbose)
-        printf("DEBUG: Allocating memory for all threads...\n");
+    log_debug("Allocating memory for all threads...\n");
 
     for (i = 0; i < threadnum; i++)
         thread_data_init(thread_datas + i);
 
-    if (verbose) {
-        printf("DEBUG: Allocated memory for all threads!\n");
-        printf("DEBUG: Starting writer thread...\n");
-    }
+    log_debug("Allocated memory for all threads!\n");
+    log_debug("Starting writer thread...\n");
 
     pthread_create(&writer_thread, 0, writerThread, 0);
 
@@ -306,8 +312,7 @@ void initializeThreads() {
         exit(EXIT_FAILURE);
     }
 
-    if (verbose)
-        printf("INFO : Giving workers initial inputs...\n");
+    log_debug("Giving workers initial inputs...\n");
 
     for (j = 0; j < threadnum; j++)
         pthread_create(&thread[j], 0, workerThread, (void *)(thread_datas+j));
@@ -320,9 +325,7 @@ void initializeThreads() {
         }
     }
 
-    if (verbose)
-        printf("INFO : Initializing worker threads...\n");
-
+    log_debug("Initializing worker threads...\n");
 }
 
 void readerThread() {
@@ -351,8 +354,7 @@ void readerThread() {
     }
     fasta_file_free(fp);
 
-    if (verbose)
-        printf("INFO : Finished handing out all the work...\n");
+    log_debug("Finished handing out all the work...\n");
 
     num_reads_flag =1;
 
@@ -374,8 +376,8 @@ int main (int argc, char **argv) {
 
     initializeSemaphores();
 
-    if (verbose)
-        printf("DEBUG: Max number of sequences per thread : %d, max bytes per thread : %d\n", MAX_SEQS_PER_BUFFER, MAX_BYTES_PER_BUFFER*5);
+    log_debug("Max number of sequences per thread : %d, max bytes per thread : %d\n",
+              MAX_SEQS_PER_BUFFER, MAX_BYTES_PER_BUFFER*5);
 
     /* read all initial model */
     get_train_from_file(hmm_file, &hmm, mstate_file, rstate_file, nstate_file, sstate_file, pstate_file,s1state_file, p1state_file, dstate_file, &train);
@@ -496,8 +498,7 @@ void writeOutputFiles(FILE *aa_outfile_fp, ThreadData *td, unsigned int buffer) 
 
     writeAminoAcids(aa_outfile_fp, td, buffer);
     num_writes++;
-    if (verbose)
-        printf("INFO: Wrote results for thread %d, buffer %d.\n", td->id, buffer );
+    log_debug("Wrote results for thread %d, buffer %d.\n", td->id, buffer );
 }
 
 void writeDNA() {
@@ -642,10 +643,8 @@ void *workerThread(void *_thread_datas) {
         runViterbiOnBuffers(td, b);
         td->output_num_sequences[b] = td->input_num_sequences[b];
 
-        if (verbose) {
-            printf("INFO: Thread %d buffer %d done work on %d sequences!\n",
-                   td->id, b, td->input_num_sequences[b]);
-        }
+        log_debug("Thread %d buffer %d done work on %d sequences!\n",
+                  td->id, b, td->input_num_sequences[b]);
 
         sem_wait(sema_Q);
         enqueue(td, b, EMPTY_Q);
