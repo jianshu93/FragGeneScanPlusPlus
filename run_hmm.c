@@ -282,7 +282,7 @@ void destroySemaphores() {
 void initializeThreads() {
 
     pthread_t *thread = calloc(threadnum, sizeof(pthread_t *));
-    thread_datas = malloc(sizeof(thread_data) * threadnum);
+    thread_datas = malloc(sizeof(ThreadData) * threadnum);
 
     // allocate memory for each thread only once!
     if (verbose)
@@ -290,7 +290,7 @@ void initializeThreads() {
 
     int k;
     for (k=0; k< threadnum; k++) {
-        init_thread_data(thread_datas+k);
+        thread_data_init(thread_datas+k);
     }
 
     if (verbose) {
@@ -396,7 +396,7 @@ int main (int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
-int read_seq_into_buffer(FastaFile *ffp, thread_data *thread_data, unsigned int buf) {
+int read_seq_into_buffer(FastaFile *ffp, ThreadData *thread_data, unsigned int buf) {
     char *seq, *name;
     int seq_len, count = 0;
 
@@ -414,7 +414,7 @@ int read_seq_into_buffer(FastaFile *ffp, thread_data *thread_data, unsigned int 
 
 }
 
-void init_thread_data(thread_data *td) {
+void thread_data_init(ThreadData *td) {
     // Initialize thread data structure
 
     td->hmm = calloc(1, sizeof(HMM));
@@ -486,7 +486,7 @@ void init_thread_data(thread_data *td) {
     }
 }
 
-void writeOutputFiles(FILE *aa_outfile_fp, thread_data *td, unsigned int buffer) {
+void writeOutputFiles(FILE *aa_outfile_fp, ThreadData *td, unsigned int buffer) {
     if (output_meta)
         writeMeta();
     if (output_dna)
@@ -514,7 +514,7 @@ void writeMeta() {
     }
 }
 
-void writeAminoAcids(FILE *aa_outfile_fp, thread_data *td, unsigned int buffer) {
+void writeAminoAcids(FILE *aa_outfile_fp, ThreadData *td, unsigned int buffer) {
     int j;
 
     for (j = 0; j < td->output_num_sequences[buffer]; j++) {
@@ -580,7 +580,7 @@ void *writerThread(void *args) {
 
             sem_wait(sema_R);
 
-            thread_data *td = temp->td;
+            ThreadData *td = temp->td;
             unsigned int buffer = temp->buffer;
 
             writeOutputFiles(aa_outfile_fp, td, buffer);
@@ -601,7 +601,7 @@ void *writerThread(void *args) {
     closeFilePointers(&aa_outfile_fp, &outfile_fp, &dna_outfile_fp );
 }
 
-void runViterbiOnBuffers(thread_data *td, unsigned int b) {
+void runViterbiOnBuffers(ThreadData *td, unsigned int b) {
 
     unsigned int i;
     for (i = 0; i < td->input_num_sequences[b]; i++) {
@@ -626,7 +626,7 @@ void runViterbiOnBuffers(thread_data *td, unsigned int b) {
 
 void *workerThread(void *_thread_datas) {
 
-    thread_data *td = (thread_data *)_thread_datas;
+    ThreadData *td = (ThreadData *)_thread_datas;
     unsigned int b = 0;
 
     while (1) {

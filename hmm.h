@@ -28,11 +28,6 @@
 #define LOG_07 -2.65926003693
 #define LOG_95 -0.05129329438
 
-#define A 0
-#define C 1
-#define G 2
-#define T 3
-
 #define NUM_STATE 29
 
 #define NOSTATE -1
@@ -153,7 +148,7 @@ typedef struct {
 
 } TRAIN;
 
-typedef struct thread_data {
+typedef struct ThreadData {
     bool wholegenome;
     bool format;
     HMM *hmm;
@@ -162,9 +157,11 @@ typedef struct thread_data {
     unsigned int *input_num_sequences;
     unsigned int  id;
 
-    // all buffers allocated by master
-    char*** input_buffer;
     char*** input_head_buffer;
+    char*** input_buffer;
+    int input_buffer_len;
+
+    // all buffers allocated by master
     char*** output_buffer;
     char*** aa_buffer;
     char*** dna_buffer;
@@ -183,15 +180,15 @@ typedef struct thread_data {
 
     SEM_T sema_r;
     SEM_T sema_w;
-} thread_data;
+} ThreadData;
 
-thread_data *thread_datas;
+ThreadData *thread_datas;
 
 HMM hmm;
 TRAIN train;
 
-void init_thread_data(thread_data* td);
-int read_seq_into_buffer(FastaFile* fp, thread_data* thread_data, unsigned int buf);
+void thread_data_init(ThreadData* td);
+int read_seq_into_buffer(FastaFile* fp, ThreadData *td, unsigned int buf);
 
 void get_prob_from_cg(HMM *hmm, TRAIN *train, char *O, int len_seq);
 void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mfilename1, char *nfilename,
@@ -223,7 +220,6 @@ void get_rc_dna(char *dna, char *rc_dna);
 void get_rc_dna_indel(char* dna_f, char* dna_f1);
 void get_corrected_dna(char *dna, char *dna_f);
 void print_usage();
-void free_thread_data(thread_data* td);
 
 /**
  * @brief Prints the output of a gene to the different buffers.

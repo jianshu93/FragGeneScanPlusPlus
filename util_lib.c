@@ -5,7 +5,7 @@
 #include "util_lib.h"
 
 // which corresponds to either 0 (done) or 1 (empty) buffer
-void enqueue(thread_data *td, unsigned int buffer, unsigned int which) {
+void enqueue(ThreadData *td, unsigned int buffer, unsigned int which) {
 
     QUEUE *item = (QUEUE *) malloc(sizeof(QUEUE));
     item->td = td;

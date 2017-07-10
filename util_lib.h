@@ -23,7 +23,7 @@ void print_usage();
 
 typedef struct q {
     struct q *next;
-    thread_data *td;
+    ThreadData *td;
     unsigned int buffer;
 } QUEUE;
 
@@ -34,7 +34,7 @@ QUEUE *q_done_tail;
 
 
 void printq(unsigned int which);
-void enq(thread_data *td, unsigned int buffer, unsigned int which);
+void enq(ThreadData *td, unsigned int buffer, unsigned int which);
 QUEUE *deq(unsigned int which);
 
 void cutnpaste_q(QUEUE **dest, unsigned int which);
