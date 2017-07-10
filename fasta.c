@@ -127,13 +127,11 @@ ReadFASTA(FASTAFILE *ffp, char **ret_seq, char **ret_name, int *ret_L) {
     int   n;
     int   nalloc;
 
-    /* Peek at the lookahead buffer; see if it appears to be a valid FASTA descline.
-    */
+    /* Peek at the lookahead buffer; see if it appears to be a valid FASTA descline. */
     if (ffp->buffer[0] != '>') return 0;
 
-    /* Parse out the name: the first non-whitespace token after the >
-    */
-    s  = strtok(ffp->buffer+1, " \t\n");
+    /* Parse out the name: the line of the > */
+    s  = strtok(ffp->buffer+1, "\n");
     //name = malloc(sizeof(char) * (strlen(s)+1));
     if ( name==0)
         name = malloc(sizeof(char) * 1024);
