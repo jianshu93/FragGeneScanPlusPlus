@@ -4,14 +4,15 @@
  * CVS $Id: fasta.c,v 1.1 2003/10/05 18:43:39 eddy Exp $
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
 
 #include "fasta.h"
 
-/* Function: OpenFASTA(), ReadFASTA(), CloseFASTA().
+/* Function: fasta_file_new(), fasta_file_read_record(), fasta_file_free().
  * Date:     SRE, Sun Sep  8 06:39:26 2002 [AA2721, transatlantic]
  *
  * Purpose:  A very rudimentary FASTA file reading API. Designed
@@ -19,26 +20,26 @@
  *
  *           The API is:
  *
- *           FASTAFILE *ffp;
+ *           FastaFile *ffp;
  *           char      *seq;
  *           char      *name;
  *           int        seqlen;
  *
- *           ffp = OpenFASTA(seqfile);
- *           while (ReadFASTA(ffp, &seq, &name, &seqlen)
+ *           ffp = fasta_file_new(seqfile);
+ *           while (fasta_file_read_record(ffp, &seq, &name, &seqlen)
  *           {
  *             do stuff with sequence;
  *             free(name);
  *             free(seq);
  *           }
- *           CloseFASTA(ffp);
+ *           fasta_file_free(ffp);
  *
  * Args:
  *           seqfile   - name of a FASTA file to open.
  *           seq       - RETURN: one sequence
  *           name      - RETURN: name of the sequence
  *           seqlen    - RETURN: length of the sequence in residues
- *           ffp       - ptr to a FASTAFILE object.
+ *           ffp       - ptr to a FastaFile object.
  *
  * Commentary:
  *           The basic problem with reading FASTA files is that there is
@@ -49,7 +50,7 @@
  *           this is to implement a one-line "lookahead" buffer that you
  *           can peek at, before parsing later.
  *
- *           This buffer is kept in a small structure (a FASTAFILE), rather
+ *           This buffer is kept in a small structure (a FastaFile), rather
  *           than in a static char[] in the function. This allows
  *           us to have multiple FASTA files open at once. The static approach
  *           would only allow us to have one file open at a time. ANSI C
@@ -89,18 +90,15 @@
 *           SQUID's sre_strtok().
 *
 * Returns:
-*           OpenFASTA() returns a FASTAFILE pointer, or NULL on failure (for
-    *           instance, if the file doesn't exist, or isn't readable).
+*           fasta_file_new() returns a FastaFile pointer, or NULL on failure (for
+*           instance, if the file doesn't exist, or isn't readable).
 *
-*           ReadFASTA() returns 1 on success, or a 0 if there are no
-*           more sequences to read in the file.
-*
-*           CloseFASTA() "always succeeds" and returns void.
+*           fasta_file_free() "always succeeds" and returns void.
 */
-FASTAFILE *OpenFASTA(char *seqfile) {
+FastaFile *fasta_file_new(char *seqfile) {
 
-    FASTAFILE *ffp;
-    ffp = malloc(sizeof(FASTAFILE));
+    FastaFile *ffp;
+    ffp = malloc(sizeof(FastaFile));
 
     if (strcmp(seqfile, "stdin") == 0) {
         ffp->fp = stdin;
@@ -119,58 +117,58 @@ FASTAFILE *OpenFASTA(char *seqfile) {
     return ffp;
 }
 
-int
-ReadFASTA(FASTAFILE *ffp, char **ret_seq, char **ret_name, int *ret_L) {
-    char *s;
-    static char *name=0;
-    static char *seq =0;
-    int   n;
-    int   nalloc;
+/**
+ * Since we don't want to do realloc again & again, estimate the needed memory by looking at the file size.
+ * Note that this is a very crude upper estimate, since a file might contain several sequences.
+ * However, it's the best can we do without sacrificing performance too much.
+ */
+static void alloc_sequence(FastaFile *ffp, char **sequence_buffer_out) {
+    struct stat sb;
+    fstat(fileno(ffp->fp), &sb);
+    *sequence_buffer_out = calloc(sb.st_size, sizeof(char));
+}
 
-    /* Peek at the lookahead buffer; see if it appears to be a valid FASTA descline. */
-    if (ffp->buffer[0] != '>') return 0;
+int fasta_file_read_record(FastaFile *ffp, char **out_seq, char **out_header, int *out_seq_len) {
+    char *s, *header, *seq;
+    int n;
 
-    /* Parse out the name: the line of the > */
+    /* Peek at the lookahead buffer; check if it's a valid FASTA header. */
+    if (ffp->buffer[0] != '>')
+        return 0;
+
+    /* Parse out the header */
     s  = strtok(ffp->buffer+1, "\n");
-    //name = malloc(sizeof(char) * (strlen(s)+1));
-    if ( name==0)
-        name = malloc(sizeof(char) * 1024);
-    strcpy(name, s);
+    //header = malloc(sizeof(char) * (strlen(s)+1));
+    header = malloc(sizeof(char) * 1024);
+    strcpy(header, s);
 
     /* Everything else 'til the next descline is the sequence.
      * Note the idiom for dynamic reallocation of seq as we
      * read more characters, so we don't have to assume a maximum
      * sequence length.
      */
-    if ( seq==0)
-        seq = malloc(sizeof(char) * 1024);     /* allocate seq in blocks of 128 residues */
-    nalloc = 128;
+    alloc_sequence (ffp, &seq);
     n = 0;
     while (fgets(ffp->buffer, STRINGLEN, ffp->fp)) {
-        if (ffp->buffer[0] == '>') break;	/* a-ha, we've reached the next descline */
+        if (ffp->buffer[0] == '>')
+            break;	/* We've reached the next header */
 
         for (s = ffp->buffer; *s != '\0'; s++) {
-            if (! isalpha(*s)) continue;  /* accept any alphabetic character */
-
+            if (!isalpha(*s))
+                continue;  /* accept any alphabetic character */
             seq[n] = *s;                  /* store the character, bump length n */
             n++;
-            if (nalloc == n) {        /* are we out of room in seq? if so, expand */
-                /* (remember, need space for the final '\0')*/
-                nalloc += 128;
-                seq = realloc(seq, sizeof(char) * nalloc);
-            }
         }
     }
     seq[n] = '\0';
 
-    *ret_name = name;
-    *ret_seq  = seq;
-    *ret_L    = n;
+    *out_header = header;
+    *out_seq = seq;
+    *out_seq_len = n;
     return 1;
 }
 
-void
-CloseFASTA(FASTAFILE *ffp) {
+void fasta_file_free(FastaFile *ffp) {
     fclose(ffp->fp);
     free(ffp);
 }

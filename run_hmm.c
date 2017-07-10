@@ -42,7 +42,7 @@ FILE *dna_outfile_fp;
 char mystring[STRINGLEN];
 char complete_sequence[STRINGLEN];
 
-FASTAFILE *fp;
+FastaFile *fp;
 
 void parseArguments(int argc, char **argv) {
     /* read command line argument */
@@ -300,7 +300,7 @@ void initializeThreads() {
 
     pthread_create(&writer_thread, 0, writerThread, 0);
 
-    fp = OpenFASTA(seq_file);
+    fp = fasta_file_new(seq_file);
 
     if (!fp) {
         printf("ERROR! Could not open seq_file %s for reading...!\n", seq_file);
@@ -351,7 +351,7 @@ void readerThread() {
             temp = temp->next;
         }
     }
-    CloseFASTA(fp);
+    fasta_file_free(fp);
 
     if (verbose)
         printf("INFO : Finished handing out all the work...\n");
@@ -396,16 +396,13 @@ int main (int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
-int read_seq_into_buffer(FASTAFILE *ffp, thread_data *thread_data, unsigned int buf) {
+int read_seq_into_buffer(FastaFile *ffp, thread_data *thread_data, unsigned int buf) {
+    char *seq, *name;
+    int seq_len, count = 0;
 
-    char *seq;
-    char *name;
-    int L;
-    int count=0;
-
-    while ((count < MAX_SEQS_PER_BUFFER) && ReadFASTA(ffp, &seq, &name, &L)) {
-        strcpy(thread_data->input_head_buffer[buf][count], name);
-        strcpy(thread_data->input_buffer[buf][count], seq);
+    while ((count < MAX_SEQS_PER_BUFFER) && fasta_file_read_record(ffp, &seq, &name, &seq_len)) {
+        thread_data->input_head_buffer[buf][count] = name;
+        thread_data->input_buffer[buf][count] = seq;
         read_counter++;
         count++;
     }
