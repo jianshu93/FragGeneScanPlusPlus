@@ -417,60 +417,6 @@ int read_seq_into_buffer(FASTAFILE *ffp, thread_data *thread_data, unsigned int 
 
 }
 
-// read as much of the file as you can into the buffer, return the file position
-// of the last carat character encountered before the memory limit was hit
-off_t read_file_into_buffer(FILE *fp, int fpos, thread_data *thread_data, unsigned int buf) {
-
-    int i = 0; // temp length of each sequence
-    long count = 0; // index for the number of sequences
-    off_t last_carat_position = 0;
-    long long total_count = 0;
-    int seq_length;
-
-    memset(complete_sequence, 0, STRINGLEN);
-    memset(mystring, 0, STRINGLEN);
-
-    // loads the input
-    while ( fgets(mystring, STRINGLEN, fp) && count < MAX_SEQS_PER_BUFFER-1 ) {
-        if (mystring[strlen(mystring)-1] == '\n') mystring[strlen(mystring)-1] = 0;
-        if (mystring[0] == '>') {
-            if (i>0) {
-                total_count += i;
-                memset(thread_data->input_buffer[buf][count], 0, STRINGLEN);
-                strcpy(thread_data->input_buffer[buf][count], complete_sequence);
-                printf("%s\n",thread_data->input_buffer[buf][count]);
-                memset(complete_sequence, 0, STRINGLEN);
-            }
-            count++;
-            read_counter++;
-            strcpy(thread_data->input_head_buffer[buf][count], mystring);
-            last_carat_position = ftello(fp);
-            i = 0;
-        } else {
-            strcat(complete_sequence, mystring);
-            seq_length = strlen(mystring);
-            while (mystring[seq_length-1] == 10 || mystring[seq_length-1]==13 || mystring[seq_length-1]==0) {
-                seq_length --;
-            }
-            i += seq_length;
-        }
-    }
-
-    strcpy(thread_data->input_buffer[buf][count], complete_sequence);
-    thread_data->input_num_sequences[buf] = count;
-    read_counter1 += thread_data->input_num_sequences[buf];
-
-    if (ferror(fp)) {
-        printf("Error with file encountered.\n");
-    } else if (feof(fp)) {
-        last_carat_position = -1; // terminating condition
-    }
-    num_reads++;
-
-    return last_carat_position;
-}
-
-
 void init_thread_data(thread_data *td) {
     // Initialize thread data structure
 
