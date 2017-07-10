@@ -230,57 +230,6 @@ int nt2int (char nt) {
 }
 
 
-int nt2int_rc (char nt) {
-
-    int result;
-
-    if      (nt == 'A' || nt == 'a') {
-        result = 3;
-    } else if (nt == 'C' || nt == 'c') {
-        result = 2;
-    } else if (nt == 'G' || nt == 'g') {
-        result = 1;
-    } else if (nt == 'T' || nt == 't') {
-        result = 0;
-    } else                            {
-        result = 4;
-    }
-
-    return result;
-}
-
-int nt2int_rc_indel (char nt) {
-
-    int result;
-
-    if      (nt == 'A' ) {
-        result = 3;
-    } else if (nt == 'C' ) {
-        result = 2;
-    } else if (nt == 'G' ) {
-        result = 1;
-    } else if (nt == 'T' ) {
-        result = 0;
-    } else if (nt == 'a' ) {
-        result = 8;
-    } else if (nt == 'c' ) {
-        result = 7;
-    } else if (nt == 'g' ) {
-        result = 6;
-    } else if (nt == 't' ) {
-        result = 5;
-    } else if (nt == 'n' ) {
-        result = 9;
-    } else if (nt == 'x' ) {
-        result = 10;
-    } else                {
-        result = 4;
-    }
-
-    return result;
-}
-
-
 int trinucleotide (char a, char b, char c) {
 
     int freq_id;
@@ -370,24 +319,62 @@ int trinucleotide_pep (char a, char b, char c) {
     return freq_id;
 }
 
-void get_rc_dna(char *dna, char *dna1) {
+// Calculates the reverse complement of the bases in `dna` and saves it in `reverse_complement`
+void get_rc_dna(char *dna, char *reverse_complement) {
+    int i, dna_len = strlen(dna);
 
-    char codon[5] = {'A', 'C', 'G', 'T', 'N'};
-    int i;
-    int dna_len = strlen(dna);
-    for (i=0; i < dna_len; i++) {
-        dna1[dna_len-i-1] = codon[nt2int_rc(dna[i])];
+    for (i = 0; i < dna_len; i++) {
+        char rc;
+        switch (dna[i]) {
+            case 'A':
+            case 'a':
+                rc = 'T';
+            case 'C':
+            case 'c':
+                rc = 'G';
+            case 'G':
+            case 'g':
+                rc = 'C';
+            case 'T':
+            case 't':
+                rc = 'A';
+            default:
+                rc = 'N';
+        }
+        reverse_complement[dna_len-i-1] = rc;
     }
 }
 
 void get_rc_dna_indel(char *dna, char *dna1) {
+    int i, dna_len = strlen(dna);
 
-    char codon[11] = {'A', 'C', 'G', 'T', 'N', 'a', 'c', 'g', 't', 'n', 'x'};
-    int i;
-    int dna_len = strlen(dna);
-    for (i=0; i < dna_len; i++) {
-
-        dna1[dna_len-i-1] = codon[nt2int_rc_indel(dna[i])];
+    for (i = 0; i < dna_len; i++) {
+        char rc;
+        switch (dna[i]) {
+            case 'A':
+                rc = 'T';
+            case 'a':
+                rc = 't';
+            case 'C':
+                rc = 'G';
+            case 'c':
+                rc = 'g';
+            case 'G':
+                rc = 'C';
+            case 'g':
+                rc = 'c';
+            case 'T':
+                rc = 'A';
+            case 't':
+                rc = 'a';
+            case 'n':
+                rc = 'n';
+            case 'x':
+                rc = 'x';
+            default:
+                rc = 'N';
+        }
+        dna1[dna_len-i-1] = rc;
     }
 }
 
