@@ -400,8 +400,9 @@ int read_seq_into_buffer(FastaFile *ffp, ThreadData *thread_data, unsigned int b
     unsigned int count = 0;
 
     while ((count < MAX_SEQS_PER_BUFFER) && fasta_file_read_record(ffp, &seq, &name, &seq_len)) {
-        thread_data->input_head_buffer[buf][count] = name;
-        thread_data->input_buffer[buf][count] = seq;
+        thread_data->record_headers[buf][count] = name;
+        thread_data->record_sequences[buf][count] = seq;
+        thread_data->record_sequences_lens[buf][count] = seq_len;
         read_counter++;
         count++;
     }
@@ -451,8 +452,10 @@ void thread_data_init(ThreadData *td) {
     td->output_num_sequences = calloc(2, sizeof(int));
     td->input_num_sequences = calloc(2, sizeof(int));
 
-    td->input_buffer = malloc(sizeof(char **) * 2);
-    td->input_head_buffer = malloc(sizeof(char **) * 2);
+    td->record_headers = malloc(sizeof(char **) * 2);
+    td->record_sequences = malloc(sizeof(char **) * 2);
+    td->record_sequences_lens = malloc(sizeof(int *) * 2);
+
     td->output_buffer = malloc(sizeof(char **) * 2);
     td->aa_buffer = malloc(sizeof(char **) * 2);
     td->dna_buffer = malloc(sizeof(char **) * 2);
@@ -468,15 +471,16 @@ void thread_data_init(ThreadData *td) {
     td->c_delete = malloc(sizeof(int) * STRINGLEN);
 
     for (i = 0; i < 2; i++) {
-        td->input_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
-        td->input_head_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->record_headers[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->record_sequences[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
+        td->record_sequences_lens[i] = malloc(sizeof(int) * MAX_SEQS_PER_BUFFER);
         td->output_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
         td->aa_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
         td->dna_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
 
         for (j = 0; j < MAX_SEQS_PER_BUFFER; j++) {
-            td->input_buffer[i][j] = calloc(1, STRINGLEN);
-            td->input_head_buffer[i][j] = calloc(1, STRINGLEN);
+            td->record_sequences[i][j] = calloc(1, STRINGLEN);
+            td->record_headers[i][j] = calloc(1, STRINGLEN);
             td->aa_buffer[i][j] = calloc(1, STRINGLEN);
             td->dna_buffer[i][j] = calloc(1, STRINGLEN);
             td->output_buffer[i][j] = calloc(1, STRINGLEN);
@@ -603,14 +607,14 @@ void runViterbiOnBuffers(ThreadData *td, unsigned int b) {
     unsigned int i;
 
     for (i = 0; i < td->input_num_sequences[b]; i++) {
-        unsigned int stringlength = strlen(td->input_buffer[b][i]);
-        get_prob_from_cg(td->hmm, &train, td->input_buffer[b][i], stringlength);
+        unsigned int stringlength = strlen(td->record_sequences[b][i]);
+        get_prob_from_cg(td->hmm, &train, td->record_sequences[b][i], stringlength);
 
-        if (td->input_buffer[b][i] && td->input_head_buffer[b][i] ) {
+        if (td->record_sequences[b][i] && td->record_headers[b][i] ) {
 
-            viterbi(td->hmm, td->input_buffer[b][i], td->output_buffer[b][i],
+            viterbi(td->hmm, td->record_sequences[b][i], td->output_buffer[b][i],
                     td->aa_buffer[b][i], td->dna_buffer[b][i],
-                    td->input_head_buffer[b][i], td->wholegenome, td->format, stringlength,
+                    td->record_headers[b][i], td->wholegenome, td->format, stringlength,
                     td->dna, td->dna1, td->dna_f, td->dna_f1, td->protein,
                     td->insert, td->c_delete, td->temp_str);
 

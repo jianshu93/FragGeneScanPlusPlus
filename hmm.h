@@ -157,9 +157,10 @@ typedef struct ThreadData {
     unsigned int *input_num_sequences;
     unsigned int  id;
 
-    char*** input_head_buffer;
-    char*** input_buffer;
-    int input_buffer_len;
+    /* The input records */
+    char*** record_headers;
+    char*** record_sequences;
+    int** record_sequences_lens;
 
     // all buffers allocated by master
     char*** output_buffer;
