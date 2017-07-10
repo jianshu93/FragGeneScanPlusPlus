@@ -608,14 +608,13 @@ void runViterbiOnBuffers(ThreadData *td, unsigned int b) {
     unsigned int i;
 
     for (i = 0; i < td->input_num_sequences[b]; i++) {
-        unsigned int stringlength = strlen(td->record_sequences[b][i]);
-        get_prob_from_cg(td->hmm, &train, td->record_sequences[b][i], stringlength);
+        get_prob_from_cg(td->hmm, &train, td->record_sequences[b][i], td->record_sequences_lens[b][i]);
 
         if (td->record_sequences[b][i] && td->record_headers[b][i] ) {
 
             viterbi(td->hmm, td->record_sequences[b][i], td->output_buffer[b][i],
                     td->aa_buffer[b][i], td->dna_buffer[b][i],
-                    td->record_headers[b][i], td->wholegenome, td->format, stringlength,
+                    td->record_headers[b][i], td->wholegenome, td->format, td->record_sequences_lens[b][i],
                     td->dna, td->dna1, td->dna_f, td->dna_f1, td->protein,
                     td->insert, td->c_delete, td->temp_str);
 
