@@ -280,6 +280,7 @@ void destroySemaphores() {
 }
 
 void initializeThreads() {
+    unsigned int i, j;
 
     pthread_t *thread = calloc(threadnum, sizeof(pthread_t *));
     thread_datas = malloc(sizeof(ThreadData) * threadnum);
@@ -288,10 +289,8 @@ void initializeThreads() {
     if (verbose)
         printf("DEBUG: Allocating memory for all threads...\n");
 
-    int k;
-    for (k=0; k< threadnum; k++) {
-        thread_data_init(thread_datas+k);
-    }
+    for (i = 0; i < threadnum; i++)
+        thread_data_init(thread_datas + i);
 
     if (verbose) {
         printf("DEBUG: Allocated memory for all threads!\n");
@@ -310,7 +309,6 @@ void initializeThreads() {
     if (verbose)
         printf("INFO : Giving workers initial inputs...\n");
 
-    int i,j;
     for (j = 0; j < threadnum; j++)
         pthread_create(&thread[j], 0, workerThread, (void *)(thread_datas+j));
 
@@ -398,7 +396,8 @@ int main (int argc, char **argv) {
 
 int read_seq_into_buffer(FastaFile *ffp, ThreadData *thread_data, unsigned int buf) {
     char *seq, *name;
-    int seq_len, count = 0;
+    int seq_len;
+    unsigned int count = 0;
 
     while ((count < MAX_SEQS_PER_BUFFER) && fasta_file_read_record(ffp, &seq, &name, &seq_len)) {
         thread_data->input_head_buffer[buf][count] = name;
@@ -415,6 +414,7 @@ int read_seq_into_buffer(FastaFile *ffp, ThreadData *thread_data, unsigned int b
 }
 
 void thread_data_init(ThreadData *td) {
+    unsigned int i, j;
     // Initialize thread data structure
 
     td->hmm = calloc(1, sizeof(HMM));
@@ -467,7 +467,6 @@ void thread_data_init(ThreadData *td) {
     td->insert = malloc(sizeof(int) * STRINGLEN);
     td->c_delete = malloc(sizeof(int) * STRINGLEN);
 
-    int i;
     for (i = 0; i < 2; i++) {
         td->input_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
         td->input_head_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
@@ -475,7 +474,6 @@ void thread_data_init(ThreadData *td) {
         td->aa_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
         td->dna_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
 
-        int j;
         for (j = 0; j < MAX_SEQS_PER_BUFFER; j++) {
             td->input_buffer[i][j] = calloc(1, STRINGLEN);
             td->input_head_buffer[i][j] = calloc(1, STRINGLEN);
@@ -602,8 +600,8 @@ void *writerThread(void *args) {
 }
 
 void runViterbiOnBuffers(ThreadData *td, unsigned int b) {
-
     unsigned int i;
+
     for (i = 0; i < td->input_num_sequences[b]; i++) {
         unsigned int stringlength = strlen(td->input_buffer[b][i]);
         get_prob_from_cg(td->hmm, &train, td->input_buffer[b][i], stringlength);
