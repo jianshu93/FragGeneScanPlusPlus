@@ -203,15 +203,73 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer, char *
              int* insert_ptr, int* c_delete_ptr, char* temp_str_ptr);
 
 void free_hmm(HMM *hmm);
+
+/**
+ * Translates the given DNA sequence.
+ *
+ * @param dna The string we want to translate.
+ * @param protein The output buffer for the protein.
+ * @param strand What strand to translate.
+ */
 void get_protein(char *dna, char *protein, int strand);
-void get_rc_dna(char *dna, char *dna1);
+
+/**
+ * Calculates the reverse-complement of given DNA
+ *
+ * @param dna The string we want to take the reverse-complement of.
+ * @param rc_dna The output buffer for the reverse-complement.
+ */
+void get_rc_dna(char *dna, char *rc_dna);
+
 void get_rc_dna_indel(char* dna_f, char* dna_f1);
 void get_corrected_dna(char *dna, char *dna_f);
 void print_usage();
 void free_thread_data(thread_data* td);
-void print_outputs(int codon_start, int start_t, int end_t, int frame, char* output_buffer, char* aa_buffer,
-                   char* dna_buffer, char* sequence_head_short, char* dna, char* dna1, char* dna_f, char* dna_f1,
-                   char* protein, int* insert, int* c_delete, int insert_id, int delete_id, bool format, char* temp_str_ptr, unsigned int multiple);
+
+/**
+ * @brief Prints the output of a gene to the different buffers.
+ *
+ * Writes a predicted gene and corresponding information to the different buffers.
+ *
+ * Putative gene information
+ * -------------------------
+ * @param codon_start What strand the gene lies on (1, -1 or 0 if unknown).
+ * @param start_t The start position of the gene.
+ * @param end_t The ending position of the gene.
+ * @param frame The frame number.
+ * @param dna The nucleotide sequence of the gene (on the sense strand).
+ * @param dna_f The (supposedly?) formatted nucleotide sequence of the gene (on the sense strand).
+ * @param insertions The list of the insertions
+ * @param insertions_len The length of `insertions`
+ * @param deletions The list of the deletions
+ * @param deletions_len The length of `deletions`
+ *
+ * The output buffers
+ * ------------------
+ * @param output_buffer The buffer for the .out-file, consisting of putative genes coordinates.
+ * @param aa_buffer The buffer for the .faa-file, the FASTA file that lists the translated proteins
+ *                  of the putative genes.
+ * @param dna_buffer The buffer for the .fnn-file, the FASTA file that lists the putative genes.
+ *
+ * Other output information
+ * -------------------------
+ * @param sequence_head_short The sequence header for the FASTA files (without '>').
+ * @param format Whether to use a formatted sequence (see `dna_f` and `rc_dna_f`)
+ * @param multiple (> 0) if multiple genes were found
+ *
+ * Temporary output buffers (already allocated)
+ * ------------------------
+ * @param rc_dna buffer which you can fill with the reverse complement of the dna.
+ * @param rc_dna_f buffer which you can fill with the formatted(?) reverse complement of the dna.
+ * @param protein buffer which you can fill with the translated gene.
+ * @param temp_str_ptr General-purpose string buffer
+ */
+void print_outputs(int codon_start, int start_t, int end_t, int frame,
+                   char* output_buffer, char* aa_buffer, char* dna_buffer,
+                   char* sequence_head_short,
+                   char* dna, char* rc_dna, char* dna_f, char* rc_dna_f, char* protein,
+                   int* insertions, int* deletions, int insertions_len, int deletions_len,
+                   bool format, char* temp_str_ptr, unsigned int multiple);
 
 // helper functions to cleanup the main function
 void setTrainDirectory(char* train_path);
