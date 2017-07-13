@@ -34,20 +34,9 @@ FastaFile *fasta_file_new(char *seqfile) {
     return ffp;
 }
 
-/**
- * Since we don't want to do realloc again & again, estimate the needed memory by looking at the file size.
- * Note that this is a very crude upper estimate, since a file might contain several sequences.
- * However, it's the best can we do without sacrificing performance too much.
- */
-static void alloc_sequence(FastaFile *ffp, char **sequence_buffer_out) {
-    struct stat sb;
-    fstat(fileno(ffp->fp), &sb);
-    *sequence_buffer_out = calloc(sb.st_size, sizeof(char));
-}
-
 int fasta_file_read_record(FastaFile *ffp, char **out_seq, char **out_header, int *out_seq_len) {
     char *s, *header, *seq;
-    int n;
+    int n, nalloc;
 
     /* Peek at the lookahead buffer; check if it's a valid FASTA header. */
     if (ffp->buffer[0] != '>')
@@ -64,8 +53,9 @@ int fasta_file_read_record(FastaFile *ffp, char **out_seq, char **out_header, in
      * read more characters, so we don't have to assume a maximum
      * sequence length.
      */
-    alloc_sequence (ffp, &seq);
+    seq = calloc(1024, sizeof(char));
     n = 0;
+    nalloc = 128;
     while (fgets(ffp->buffer, STRINGLEN, ffp->fp)) {
         if (ffp->buffer[0] == '>')
             break;	/* We've reached the next header */
@@ -75,6 +65,11 @@ int fasta_file_read_record(FastaFile *ffp, char **out_seq, char **out_header, in
                 continue;  /* accept any alphabetic character */
             seq[n] = *s;                  /* store the character, bump length n */
             n++;
+            if (nalloc == n) {        /* are we out of room in seq? if so, expand */
+                /* (remember, need space for the final '\0')*/
+                nalloc += 128;
+                seq = realloc(seq, sizeof(char) * nalloc);
+            }
         }
     }
     seq[n] = '\0';
