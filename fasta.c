@@ -44,8 +44,10 @@ int fasta_file_read_record(FastaFile *ffp, char **out_seq, char **out_header, in
 
     /* Parse out the header */
     s  = strtok(ffp->buffer+1, "\n");
-    //header = malloc(sizeof(char) * (strlen(s)+1));
-    header = malloc(sizeof(char) * 1024);
+    if (s == NULL)
+        return 0;
+
+    header = malloc(sizeof(char) * (strlen(s)+1));
     strcpy(header, s);
 
     /* Everything else 'til the next descline is the sequence.
