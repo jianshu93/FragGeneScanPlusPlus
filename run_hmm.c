@@ -291,8 +291,8 @@ void destroySemaphores() {
 void initializeThreads() {
     unsigned int i, j;
 
-    pthread_t *thread = calloc(threadnum, sizeof(pthread_t *));
-    thread_datas = malloc(sizeof(ThreadData) * threadnum);
+    pthread_t *thread = calloc(threadnum, sizeof(pthread_t));
+    thread_datas = calloc(threadnum, sizeof(ThreadData));
 
     // allocate memory for each thread only once!
     log_debug("Allocating memory for all threads...\n");
@@ -313,19 +313,17 @@ void initializeThreads() {
     }
 
     log_debug("Giving workers initial inputs...\n");
-
-    for (j = 0; j < threadnum; j++)
-        pthread_create(&thread[j], 0, workerThread, (void *)(thread_datas+j));
-
     for (j = 0; j < threadnum; j++) {
         for (i = 0; i < 2; i++) {
-            if ((stopped_at_fpos = read_seq_into_buffer(fp, thread_datas + j, i)) != 0) {
+            if ((stopped_at_fpos = read_seq_into_buffer(fp, thread_datas + j, i, true)) != 0) {
                 sem_post(thread_datas[j].sema_r);
             }
         }
     }
 
-    log_debug("Initializing worker threads...\n");
+    log_debug("Starting worker threads...\n");
+    for (j = 0; j < threadnum; j++)
+        pthread_create(&thread[j], 0, workerThread, (void *)(thread_datas+j));
 }
 
 void readerThread() {
@@ -340,7 +338,7 @@ void readerThread() {
 
         while (temp) {
             sem_wait(sema_R);
-            stopped_at_fpos = read_seq_into_buffer(fp,  temp->td, temp->buffer);
+            stopped_at_fpos = read_seq_into_buffer(fp,  temp->td, temp->buffer, false);
 
             if (stopped_at_fpos == 0) {
                 num_reads_flag =1;
@@ -396,10 +394,18 @@ int main (int argc, char **argv) {
     return EXIT_SUCCESS;
 }
 
-int read_seq_into_buffer(FastaFile *ffp, ThreadData *thread_data, unsigned int buf) {
+int read_seq_into_buffer(FastaFile *ffp, ThreadData *thread_data, unsigned int buf, bool initial_input) {
     char *seq, *name;
     int seq_len;
-    unsigned int count = 0;
+    unsigned int count = 0, i;
+
+    if (! initial_input) {
+
+        for (i = 0; i < MAX_SEQS_PER_BUFFER; i++) {
+            free(thread_data->record_headers[buf][i]);
+            free(thread_data->record_sequences[buf][i]);
+        }
+    }
 
     while ((count < MAX_SEQS_PER_BUFFER) && fasta_file_read_record(ffp, &seq, &name, &seq_len)) {
         thread_data->record_headers[buf][count] = name;
@@ -410,10 +416,9 @@ int read_seq_into_buffer(FastaFile *ffp, ThreadData *thread_data, unsigned int b
     }
 
     thread_data->input_num_sequences[buf] = count;
-    read_counter1 += thread_data->input_num_sequences[buf];
+    read_counter1 += count;
 
     return count;
-
 }
 
 void thread_data_init(ThreadData *td) {
@@ -451,8 +456,8 @@ void thread_data_init(ThreadData *td) {
 #endif
 
     // TODO : refactor to as many single large malloc calls as possible
-    td->output_num_sequences = calloc(2, sizeof(int));
-    td->input_num_sequences = calloc(2, sizeof(int));
+    td->output_num_sequences = calloc(2, sizeof(unsigned int));
+    td->input_num_sequences = calloc(2, sizeof(unsigned int));
 
     td->record_headers = malloc(sizeof(char **) * 2);
     td->record_sequences = malloc(sizeof(char **) * 2);
@@ -481,11 +486,9 @@ void thread_data_init(ThreadData *td) {
         td->dna_buffer[i] = malloc(sizeof(char *) * MAX_SEQS_PER_BUFFER);
 
         for (j = 0; j < MAX_SEQS_PER_BUFFER; j++) {
-            td->record_sequences[i][j] = calloc(1, STRINGLEN);
-            td->record_headers[i][j] = calloc(1, STRINGLEN);
-            td->aa_buffer[i][j] = calloc(1, STRINGLEN);
-            td->dna_buffer[i][j] = calloc(1, STRINGLEN);
-            td->output_buffer[i][j] = calloc(1, STRINGLEN);
+            td->aa_buffer[i][j] = calloc(STRINGLEN, sizeof(char));
+            td->dna_buffer[i][j] = calloc(STRINGLEN, sizeof(char));
+            td->output_buffer[i][j] = calloc(STRINGLEN, sizeof(char));
         }
     }
 }

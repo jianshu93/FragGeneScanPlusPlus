@@ -207,7 +207,7 @@ HMM hmm;
 TRAIN train;
 
 void thread_data_init(ThreadData* td);
-int read_seq_into_buffer(FastaFile* fp, ThreadData *td, unsigned int buf);
+int read_seq_into_buffer(FastaFile* fp, ThreadData *td, unsigned int buf, bool initial_input);
 
 void get_prob_from_cg(HMM *hmm, TRAIN *train, char *O, int len_seq);
 void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mfilename1, char *nfilename,
