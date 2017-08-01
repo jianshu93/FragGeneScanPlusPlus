@@ -25,10 +25,10 @@ FastaFile *fasta_file_new(char *seqfile) {
             free(ffp);
             return NULL;
         }
-        if ((fgets(ffp->buffer, STRINGLEN, ffp->fp)) == NULL) {
-            free(ffp);
-            return NULL;
-        }
+    }
+    if ((fgets(ffp->buffer, STRINGLEN, ffp->fp)) == NULL) {
+        free(ffp);
+        return NULL;
     }
 
     return ffp;
