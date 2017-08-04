@@ -7,42 +7,51 @@
 
 #include "run_hmm.h"
 
-unsigned int ids; // thread id
-unsigned int threadnum = 1;
+/* User-specified options */
 bool format = false;
 bool wholegenome = false;
 bool output_dna = false;
 bool output_meta = false;
 bool verbose = false;
+int max_mem = 0;
+unsigned int threadnum = 1;
+char aa_file[STRINGLEN];
+char seq_file[STRINGLEN];
+char out_file[STRINGLEN];
+char dna_file[STRINGLEN];
+char train_dir[STRINGLEN];
+
+/* Files located in the train directory */
+char hmm_file[STRINGLEN];
+char train_file[STRINGLEN];
+char mstate_file[STRINGLEN];
+char rstate_file[STRINGLEN];
+char nstate_file[STRINGLEN];
+char sstate_file[STRINGLEN];
+char pstate_file[STRINGLEN];
+char s1state_file[STRINGLEN];     /* stop codon of gene in - stand */
+char p1state_file[STRINGLEN];
+char dstate_file[STRINGLEN];
+
 unsigned int MAX_BYTES_PER_BUFFER;
 unsigned int MAX_SEQS_PER_BUFFER;
-unsigned int num_reads_flag = 0;
 
-int max_mem = 0;
-
-pthread_t writer_thread;
-long long round_counter;
+/* READER THREAD */
+/** The input sequence file */
+FastaFile *fp = NULL;
+/** Whether we're done reading the whole input */
+bool num_reads_flag = false;
+/** The nr of sequences we've read */
+long read_counter = 0;
 off_t stopped_at_fpos; // tracks how far we've read in the input
 
-long writer_counter = 0;
-long read_counter = 0;
-long read_counter1 = 0;
-long work_counter = 0;
-long total_reads = -1;
-long viterbi_counter = 0;
-long num_writes = 0, num_reads=0;
-
-SEM_T work_sema;
-SEM_T stop_sema;
-SEM_T counter_sema;
-
+/* WRITER THREAD */
+/** The writer thread, the thread that waits for finished worker threads and handles the output */
+pthread_t writer_thread;
 FILE *outfile_fp;
 FILE *dna_outfile_fp;
-
-char mystring[STRINGLEN];
-char complete_sequence[STRINGLEN];
-
-FastaFile *fp;
+/** The nr of sequences the writer thread has outputted */
+long writer_counter = 0;
 
 /* Macro to have easy debug messages */
 #define log_debug(...) \
@@ -225,46 +234,34 @@ void setTrainDirectory(char *train_path) {
 void initializeSemaphores() {
 
 #ifdef __APPLE__
-    sem_unlink("/work_sema");
     sem_unlink("/sema_Q");
     sem_unlink("/sema_R");
     sem_unlink("/sema_r");
     sem_unlink("/sema_w");
-    sem_unlink("/stop_sema");
-    sem_unlink("/COUNTER_SEMA");
 
-    if ((work_sema = sem_open("/work_sema", O_CREAT, 0644, 1)) == SEM_FAILED ||
-            (sema_Q = sem_open("/sema_Q", O_CREAT, 0644, 1)) == SEM_FAILED ||
+    if ((sema_Q = sem_open("/sema_Q", O_CREAT, 0644, 1)) == SEM_FAILED ||
             (sema_R = sem_open("/sema_R", O_CREAT, 0644, 1)) == SEM_FAILED ||
             (sema_r = sem_open("/sema_r", O_CREAT, 0644, 1)) == SEM_FAILED ||
-            (sema_w = sem_open("/sema_w", O_CREAT, 0644, 1)) == SEM_FAILED ||
-            (stop_sema = sem_open("/stop_sema", O_CREAT, 0644, 1)) == SEM_FAILED ||
-            (counter_sema = sem_open("/COUNTER_SEMA", O_CREAT, 0644, 1)) == SEM_FAILED) {
+            (sema_w = sem_open("/sema_w", O_CREAT, 0644, 1)) == SEM_FAILED) {
         perror("ERROR: sem_open");
         exit(EXIT_FAILURE);
     }
 
 #elif __linux
-    sem_init(&work_sema, 0, 1);
     sem_init(&sema_Q, 0, 1);
     sem_init(&sema_R, 0, 1);
     sem_init(&sema_r, 0, 0);
     sem_init(&sema_w, 0, 0);
-    sem_init(&stop_sema, 0, 0);
-    sem_init(&counter_sema, 0, 1);
 #endif
 }
 
 void destroySemaphores() {
 
 #ifdef __APPLE__
-    sem_unlink("/work_sema");
     sem_unlink("/sema_Q");
     sem_unlink("/sema_R");
     sem_unlink("/sema_r");
     sem_unlink("/sema_w");
-    sem_unlink("/stop_sema");
-    sem_unlink("/COUNTER_SEMA");
 
     char name[40];
     int j;
@@ -277,13 +274,10 @@ void destroySemaphores() {
     }
 
 #elif __linux
-    sem_destroy(&work_sema);
     sem_destroy(&sema_Q);
     sem_destroy(&sema_R);
     sem_destroy(&sema_r);
     sem_destroy(&sema_w);
-    sem_destroy(&stop_sema);
-    sem_destroy(&counter_sema);
 #endif
 
 }
@@ -291,26 +285,28 @@ void destroySemaphores() {
 void initializeThreads() {
     unsigned int i, j;
 
-    pthread_t *thread = calloc(threadnum, sizeof(pthread_t));
-    thread_datas = calloc(threadnum, sizeof(ThreadData));
-
     // allocate memory for each thread only once!
     log_debug("Allocating memory for all threads...\n");
 
+    pthread_t *thread = calloc(threadnum, sizeof(pthread_t));
+    thread_datas = calloc(threadnum, sizeof(ThreadData));
     for (i = 0; i < threadnum; i++)
-        thread_data_init(thread_datas + i);
+        thread_data_init(thread_datas + i, i);
 
     log_debug("Allocated memory for all threads!\n");
-    log_debug("Starting writer thread...\n");
 
+
+    log_debug("Starting the writer thread...\n");
     pthread_create(&writer_thread, 0, writerThread, 0);
 
-    fp = fasta_file_new(seq_file);
 
+    log_debug("Opening the sequence file...\n");
+    fp = fasta_file_new(seq_file);
     if (!fp) {
-        printf("ERROR! Could not open seq_file %s for reading...!\n", seq_file);
+        printf("ERROR! Could not open seqence file %s for reading...!\n", seq_file);
         exit(EXIT_FAILURE);
     }
+
 
     log_debug("Giving workers initial inputs...\n");
     for (j = 0; j < threadnum; j++) {
@@ -331,37 +327,34 @@ void readerThread() {
     while (stopped_at_fpos!=0) {
         sem_wait(sema_r);
 
+        /* Fetch the queue of threads that are waiting for input */
         sem_wait(sema_Q);
         QUEUE *temp;
         cutnpaste_q(&temp, EMPTY_Q);
         sem_post(sema_Q);
 
-        while (temp) {
+        /* Iterate over the queue */
+        for (; temp != NULL; temp = temp->next) {
             sem_wait(sema_R);
             stopped_at_fpos = read_seq_into_buffer(fp,  temp->td, temp->buffer, false);
 
-            if (stopped_at_fpos == 0) {
-                num_reads_flag =1;
-            }
+            /* We've fully read the input sequence file */
+            if (stopped_at_fpos == 0)
+                num_reads_flag = true;
 
             sem_post(sema_R);
 
+            /* Tell the worker thread we're done reading input */
             sem_post(temp->td->sema_r);
-            temp = temp->next;
         }
     }
-    fasta_file_free(fp);
 
     log_debug("Finished handing out all the work...\n");
-
-    num_reads_flag =1;
-
-    sem_wait(stop_sema);
+    fasta_file_free(fp);
+    num_reads_flag = true;
 }
 
 int main (int argc, char **argv) {
-
-    fp = 0;
     setTrainDirectory("train");
 
     parseArguments(argc, argv);
@@ -380,13 +373,16 @@ int main (int argc, char **argv) {
     /* read all initial model */
     get_train_from_file(hmm_file, &hmm, mstate_file, rstate_file, nstate_file, sstate_file, pstate_file,s1state_file, p1state_file, dstate_file, &train);
 
-    // prepare all of the worker threads as well as the writer thread
+    /* prepare all of the worker threads as well as the writer thread */
     initializeThreads();
 
-    // master loop - while we haven't exhausted reading the file yet
+    /* The master thread becomes the reader threadn which reads the rest of the input sequence file */
     readerThread();
 
-    // destroy the semaphores if we have a mac machine
+    /* Now wait for the writer thread to finish before exiting */
+    pthread_join(writer_thread, NULL);
+
+    /* destroy the semaphores */
     destroySemaphores();
 
     printf("Run finished with %d threads.\n", threadnum);
@@ -416,12 +412,11 @@ int read_seq_into_buffer(FastaFile *ffp, ThreadData *thread_data, unsigned int b
     }
 
     thread_data->input_num_sequences[buf] = count;
-    read_counter1 += count;
 
     return count;
 }
 
-void thread_data_init(ThreadData *td) {
+void thread_data_init(ThreadData *td, unsigned int id) {
     unsigned int i, j;
     // Initialize thread data structure
 
@@ -430,8 +425,7 @@ void thread_data_init(ThreadData *td) {
 
     td->wholegenome = wholegenome;
 
-    td->id = ids;
-    ids++;
+    td->id = id;
 
 #ifdef __APPLE__
     char name[40];
@@ -500,7 +494,6 @@ void writeOutputFiles(FILE *aa_outfile_fp, ThreadData *td, unsigned int buffer) 
         writeDNA();
 
     writeAminoAcids(aa_outfile_fp, td, buffer);
-    num_writes++;
     log_debug("Wrote results for thread %d, buffer %d.\n", td->id, buffer );
 }
 
@@ -521,7 +514,7 @@ void writeMeta() {
 }
 
 void writeAminoAcids(FILE *aa_outfile_fp, ThreadData *td, unsigned int buffer) {
-    int j;
+    unsigned int j;
 
     for (j = 0; j < td->output_num_sequences[buffer]; j++) {
         writer_counter++;
@@ -568,43 +561,41 @@ void closeFilePointers( FILE **aa_outfile_fp, FILE **outfile_fp, FILE **dna_outf
 }
 
 void *writerThread(void *args) {
-
-    int j;
     FILE *aa_outfile_fp = openFilePointers();
 
-    while (1) {
+    while (true) {
+        QUEUE *temp;
 
         sem_wait(sema_w);
 
-        QUEUE *temp;
-
+        /* Fetch the queue of worker threads that are done */
         sem_wait(sema_Q);
         cutnpaste_q(&temp, DONE_Q);
         sem_post(sema_Q);
 
-        while (temp) {
-
+        /* Iterate over the queue */
+        for (; temp != NULL; temp = temp->next) {
             sem_wait(sema_R);
 
             ThreadData *td = temp->td;
-            unsigned int buffer = temp->buffer;
-
-            writeOutputFiles(aa_outfile_fp, td, buffer);
+            writeOutputFiles(aa_outfile_fp, td, temp->buffer);
 
             sem_post(sema_R);
+
+            /* Tell the worker thread we've written the output,
+             * so it can continue using its buffers */
             sem_post(td->sema_w);
-
-            temp = temp->next;
         }
 
-        if (num_reads_flag == 1 && writer_counter == read_counter) {
-            sem_post(stop_sema);
+        /* Check if we're done, i.e. the whole input was read and processed*/
+        if (num_reads_flag && writer_counter == read_counter)
             break;
-        }
-
     }
 
+    /* We're done writing, so close the output files */
     closeFilePointers(&aa_outfile_fp, &outfile_fp, &dna_outfile_fp );
+
+    return NULL;
 }
 
 void runViterbiOnBuffers(ThreadData *td, unsigned int b) {
@@ -620,10 +611,6 @@ void runViterbiOnBuffers(ThreadData *td, unsigned int b) {
                     td->record_headers[b][i], td->wholegenome, td->format, td->record_sequences_lens[b][i],
                     td->dna, td->dna1, td->dna_f, td->dna_f1, td->protein,
                     td->insert, td->c_delete, td->temp_str);
-
-            sem_wait(work_sema);
-            work_counter++;
-            sem_post(work_sema);
         }
     }
 
@@ -634,13 +621,13 @@ void *workerThread(void *_thread_datas) {
     ThreadData *td = (ThreadData *)_thread_datas;
     unsigned int b = 0;
 
-    while (1) {
+    while (true) {
+        /* Wait until the reader thread allows us to start */
         sem_wait(td->sema_r);
-        sem_wait(td->sema_w);
 
-        sem_wait(counter_sema);
-        viterbi_counter +=  td->input_num_sequences[b];
-        sem_post(counter_sema);
+        /* Wait until the writer thread is done writing output
+         * from the previous buffers before continuing */
+        sem_wait(td->sema_w);
 
         runViterbiOnBuffers(td, b);
         td->output_num_sequences[b] = td->input_num_sequences[b];
@@ -648,11 +635,13 @@ void *workerThread(void *_thread_datas) {
         log_debug("Thread %d buffer %d done work on %d sequences!\n",
                   td->id, b, td->input_num_sequences[b]);
 
+        /* Critical section: queues */
         sem_wait(sema_Q);
         enqueue(td, b, EMPTY_Q);
         enqueue(td, b, DONE_Q);
-
         sem_post(sema_Q);
+
+        /* Block again until more was read */
         sem_post(sema_r);
         sem_post(sema_w);
 

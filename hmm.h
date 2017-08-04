@@ -116,21 +116,6 @@ typedef enum {
     TR_ES,
     TR_ES1,
 } HMM_StateTransition;
-char hmm_file[STRINGLEN];
-char aa_file[STRINGLEN];
-char seq_file[STRINGLEN];
-char out_file[STRINGLEN];
-char dna_file[STRINGLEN];
-char train_file[STRINGLEN];
-char mstate_file[STRINGLEN];
-char rstate_file[STRINGLEN];
-char nstate_file[STRINGLEN];
-char sstate_file[STRINGLEN];
-char pstate_file[STRINGLEN];
-char s1state_file[STRINGLEN];     /* stop codon of gene in - stand */
-char p1state_file[STRINGLEN];
-char dstate_file[STRINGLEN];
-char train_dir[STRINGLEN];
 
 // semaphores
 #ifdef __APPLE__
@@ -206,7 +191,7 @@ typedef struct {
 } TRAIN;
 
 /**
- * The data that can be used by each thread separately (without locking).
+ * The data that can be used by each worker thread separately.
  */
 typedef struct {
     /** The ID for this thread, a unique number. */
@@ -257,7 +242,10 @@ ThreadData *thread_datas;
 HMM hmm;
 TRAIN train;
 
-void thread_data_init(ThreadData* td);
+/**
+ * Creates the data for a worker thread
+ */
+void thread_data_init(ThreadData* td, unsigned int id);
 int read_seq_into_buffer(FastaFile* fp, ThreadData *td, unsigned int buf, bool initial_input);
 
 void get_prob_from_cg(HMM *hmm, TRAIN *train, char *O, int len_seq);
@@ -269,15 +257,6 @@ void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer, char *
              int* insert_ptr, int* c_delete_ptr, char* temp_str_ptr);
 
 void free_hmm(HMM *hmm);
-
-/**
- * Translates the given DNA sequence.
- *
- * @param dna The sequence we want to translate.
- * @param[out] protein The output buffer for the protein.
- * @param strand What strand to translate.
- */
-void get_protein(char *dna, char *protein, int strand);
 
 /**
  * Calculates the reverse-complement of given DNA
@@ -339,7 +318,12 @@ void print_outputs(int codon_start, int start_t, int end_t, int frame,
 // helper functions to cleanup the main function
 void setTrainDirectory(char* train_path);
 void conductWork();
+
+/**
+ * Initializes the writer thread and the worker threads.
+ */
 void initializeThreads();
+
 void destroySemaphores();
 void initializeSemaphores();
 void setupProgram(int argc, char** argv);
