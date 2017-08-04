@@ -20,11 +20,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "fasta.h" // STRINGLEN 
+#include "fasta.h"
 
+/** The queue for worker threads that are waiting for the writer thread */
 #define DONE_Q 0
+/** The queue for worker threads that are waiting for input */
 #define EMPTY_Q 1
 
+/* Some precomputed mathematical constants */
 #define LOG_53 -0.63487827243
 #define LOG_16 -1.83258146375
 #define LOG_30 -1.20397280433
@@ -34,54 +37,85 @@
 #define LOG_07 -2.65926003693
 #define LOG_95 -0.05129329438
 
+/** A nucleotide */
+typedef enum {
+    /** Adenine (A) */
+    NUCL_A,
+    /** Cytosine (C) */
+    NUCL_C,
+    /** Guanine (G) */
+    NUCL_G,
+    /** Thymine (T) */
+    NUCL_T,
+
+    NUCL_INVALID
+} Nucleotide;
+
+/** The amount of possible states */
 #define NUM_STATE 29
 
-#define NOSTATE -1
-#define S_STATE 0
-#define E_STATE 1
-#define R_STATE 2
-#define S_STATE_1 3
-#define E_STATE_1 4
-#define M1_STATE 5
-#define M2_STATE 6
-#define M3_STATE 7
-#define M4_STATE 8
-#define M5_STATE 9
-#define M6_STATE 10
-#define M1_STATE_1 11
-#define M2_STATE_1 12
-#define M3_STATE_1 13
-#define M4_STATE_1 14
-#define M5_STATE_1 15
-#define M6_STATE_1 16
-#define I1_STATE 17
-#define I2_STATE 18
-#define I3_STATE 19
-#define I4_STATE 20
-#define I5_STATE 21
-#define I6_STATE 22
-#define I1_STATE_1 23
-#define I2_STATE_1 24
-#define I3_STATE_1 25
-#define I4_STATE_1 26
-#define I5_STATE_1 27
-#define I6_STATE_1 28
+/** The possible states of the HMM */
+typedef enum {
+    NOSTATE = -1,
+    S_STATE,
+    E_STATE,
+    R_STATE,
+    S_STATE_1,
+    E_STATE_1,
+    M1_STATE,
+    M2_STATE,
+    M3_STATE,
+    M4_STATE,
+    M5_STATE,
+    M6_STATE,
+    M1_STATE_1,
+    M2_STATE_1,
+    M3_STATE_1,
+    M4_STATE_1,
+    M5_STATE_1,
+    M6_STATE_1,
+    I1_STATE,
+    I2_STATE,
+    I3_STATE,
+    I4_STATE,
+    I5_STATE,
+    I6_STATE,
+    I1_STATE_1,
+    I2_STATE_1,
+    I3_STATE_1,
+    I4_STATE_1,
+    I5_STATE_1,
+    I6_STATE_1,
+} HMM_State;
 
-#define TR_MM 0
-#define TR_MI 1
-#define TR_MD 2
-#define TR_II 3
-#define TR_IM 4
-#define TR_DD 5
-#define TR_DM 6
-#define TR_GE 7
-#define TR_GG 8
-#define TR_ER 9
-#define TR_RS 10
-#define TR_RR 11
-#define TR_ES 12
-#define TR_ES1 13
+/** The amount of possible state transitions */
+#define NUM_TRANSITIONS 14
 
+/**
+ * The transition types (used in e.g. HMM->tr)
+ * The first letter is the from state, the second letter the to state.
+ *
+ * The first 7 transitions occur in gene regions, which has states
+ * M[atch], I[nsertion] and D[eletion]
+ *
+ * For example, TR_MD is a transition from a match state to a deletion state.
+ */
+typedef enum {
+    TR_MM,
+    TR_MI,
+    TR_MD,
+    TR_II,
+    TR_IM,
+    TR_DD,
+    TR_DM,
+    TR_GE,
+    TR_GG,
+    TR_ER,
+    TR_RS,
+    TR_RR,
+    TR_ES,
+    TR_ES1,
+} HMM_StateTransition;
 char hmm_file[STRINGLEN];
 char aa_file[STRINGLEN];
 char seq_file[STRINGLEN];
@@ -107,19 +141,36 @@ typedef sem_t SEM_T;
 #define sem_post(x) sem_post(&x)
 #endif
 
+/**
+ * Should always be used when accessing/modifying a queue.
+ */
 SEM_T sema_Q;
+/**
+ * Used by the reader thread to make sure a worker thread doesn't try to handle input
+ * before it's fully read.
+ */
 SEM_T sema_R;
+
 SEM_T sema_r;
 SEM_T sema_w;
 
 
 typedef struct {
 
-    double  pi[29];    /* pi[1..N] pi[i] is the initial state distribution. */
+    /**
+     * pi[1..N] pi[i] is the initial state distribution.
+     */
+    double  pi[NUM_STATE];
 
-    double tr[14];                 /* transition probability from a (delete/insert/match) state to a state */
+    /**
+     * The transition probabilities (see also ::StateTransition)
+     */
+    double tr[NUM_TRANSITIONS];
 
-    double e_M_1[6][16][4];      /* transition probability from a lowest-level state  to a  lowest-level state*/
+    /**
+     * The transition probability from a lowest-level state  to a lowest-level state
+     */
+    double e_M_1[6][16][4];
     double e_M[6][16][4];
 
     double tr_R_R[4][4];
