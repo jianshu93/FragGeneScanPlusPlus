@@ -57,17 +57,17 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     if ((O[0] == 'T') && (((O[1] == 'A') && (O[2] == 'A')) ||
                           ((O[1] == 'A') && (O[2] == 'G')) || ((O[1] == 'G') && (O[2] == 'A')))) {
 
-        alpha[E_STATE][0] = max_dbl;
-        alpha[E_STATE][1] = max_dbl;
+        alpha[E_STATE][0] = DBL_MAX;
+        alpha[E_STATE][1] = DBL_MAX;
         path[E_STATE][1] = E_STATE;
         path[E_STATE][2] = E_STATE;
 
-        alpha[M6_STATE][2] = max_dbl;
-        alpha[M5_STATE][1] = max_dbl;
-        alpha[M4_STATE][0] = max_dbl;
-        alpha[M3_STATE][2] = max_dbl;
-        alpha[M2_STATE][1] = max_dbl;
-        alpha[M1_STATE][0] = max_dbl;
+        alpha[M6_STATE][2] = DBL_MAX;
+        alpha[M5_STATE][1] = DBL_MAX;
+        alpha[M4_STATE][0] = DBL_MAX;
+        alpha[M3_STATE][2] = DBL_MAX;
+        alpha[M2_STATE][1] = DBL_MAX;
+        alpha[M1_STATE][0] = DBL_MAX;
 
         if ((O[1] == 'A') && (O[2] == 'A')) {
             alpha[E_STATE][2] = alpha[E_STATE][2] - LOG_53;
@@ -82,14 +82,14 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             (((O[0] == 'T') && (O[1] == 'T')) ||
              ((O[0] == 'C') && (O[1] == 'T')) ||
              ((O[0] == 'T') && (O[1] == 'C')))) {
-        alpha[S_STATE_1][0] = max_dbl;
-        alpha[S_STATE_1][1] = max_dbl;
+        alpha[S_STATE_1][0] = DBL_MAX;
+        alpha[S_STATE_1][1] = DBL_MAX;
         alpha[S_STATE_1][2] = alpha[S_STATE][0];
         path[S_STATE_1][1] = S_STATE_1;
         path[S_STATE_1][2] = S_STATE_1;
 
-        alpha[M3_STATE_1][2] = max_dbl;
-        alpha[M6_STATE_1][2] = max_dbl;
+        alpha[M3_STATE_1][2] = DBL_MAX;
+        alpha[M6_STATE_1][2] = DBL_MAX;
 
         if ((O[0] == 'T') && (O[1] == 'T')) {
             alpha[S_STATE_1][2] = alpha[S_STATE_1][2] - LOG_53;
@@ -133,7 +133,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
         /******************/
 
         for (i = M1_STATE; i <= M6_STATE; i++)   {
-            if (alpha[i][t]<max_dbl) {
+            if (alpha[i][t]<DBL_MAX) {
                 if (t==0) {
                 } else {
                     if (i==M1_STATE) {
@@ -445,7 +445,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
         /******************/
         if (alpha[E_STATE][t] == 0) {
 
-            alpha[E_STATE][t] = max_dbl;
+            alpha[E_STATE][t] = DBL_MAX;
             path[E_STATE][t] = NOSTATE;
 
             if (t < len_seq -2 && (O[t] == 'T')  &&
@@ -453,7 +453,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                      ((O[t+1] == 'A') && (O[t+2] == 'G')) ||
                      ((O[t+1] == 'G') && (O[t+2] == 'A')))) {
 
-                alpha[E_STATE][t+2] = max_dbl;
+                alpha[E_STATE][t+2] = DBL_MAX;
                 /* transition from frame4,frame5,and frame6 */
                 temp_alpha = alpha[M6_STATE][t-1] - (hmm_ptr->tr[TR_GE]);
                 if (temp_alpha < alpha[E_STATE][t+2]) {
@@ -468,17 +468,17 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                     path[E_STATE][t] = M3_STATE;
                 }
 
-                alpha[E_STATE][t] = max_dbl;
-                alpha[E_STATE][t+1] = max_dbl;
+                alpha[E_STATE][t] = DBL_MAX;
+                alpha[E_STATE][t+1] = DBL_MAX;
                 path[E_STATE][t+1] = E_STATE;
                 path[E_STATE][t+2] = E_STATE;
 
-                alpha[M6_STATE][t+2] = max_dbl;
-                alpha[M5_STATE][t+1] = max_dbl;
-                alpha[M4_STATE][t] = max_dbl;
-                alpha[M3_STATE][t+2] = max_dbl;
-                alpha[M2_STATE][t+1] = max_dbl;
-                alpha[M1_STATE][t] = max_dbl;
+                alpha[M6_STATE][t+2] = DBL_MAX;
+                alpha[M5_STATE][t+1] = DBL_MAX;
+                alpha[M4_STATE][t] = DBL_MAX;
+                alpha[M3_STATE][t+2] = DBL_MAX;
+                alpha[M2_STATE][t+1] = DBL_MAX;
+                alpha[M1_STATE][t] = DBL_MAX;
 
                 if ((O[t+1] == 'A') && (O[t+2] == 'A')) {
                     alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - (0.54);
@@ -527,7 +527,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
         /*************************************************/
         if (alpha[S_STATE_1][t] == 0) {
 
-            alpha[S_STATE_1][t] = max_dbl;
+            alpha[S_STATE_1][t] = DBL_MAX;
             path[S_STATE_1][t] = NOSTATE;
 
 
@@ -536,9 +536,9 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                      ((O[t] == 'C') && (O[t+1] == 'T')) ||
                      ((O[t] == 'T') && (O[t+1] == 'C')))) {
 
-                alpha[S_STATE_1][t] = max_dbl;
+                alpha[S_STATE_1][t] = DBL_MAX;
                 path[S_STATE_1][t] = R_STATE;
-                alpha[S_STATE_1][t+1] = max_dbl;
+                alpha[S_STATE_1][t+1] = DBL_MAX;
                 alpha[S_STATE_1][t+2] = alpha[R_STATE][t-1] - (hmm_ptr->tr[TR_RS]);
                 path[S_STATE_1][t+1] = S_STATE_1;
                 path[S_STATE_1][t+2] = S_STATE_1;
@@ -555,8 +555,8 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                     path[S_STATE_1][t] = E_STATE;
                 }
 
-                alpha[M3_STATE_1][t+2] = max_dbl;
-                alpha[M6_STATE_1][t+2] = max_dbl;
+                alpha[M3_STATE_1][t+2] = DBL_MAX;
+                alpha[M6_STATE_1][t+2] = DBL_MAX;
 
                 if ((O[t] == 'T') && (O[t+1] == 'T')) {
                     alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - (0.54);
@@ -590,14 +590,14 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
         /************************/
         if (alpha[S_STATE][t] == 0) {
 
-            alpha[S_STATE][t] = max_dbl;
+            alpha[S_STATE][t] = DBL_MAX;
             path[S_STATE][t] = NOSTATE;
 
             if (t<len_seq-2 &&  (O[t+1] == 'T') && (O[t+2] == 'G')&&
                     ((O[t] == 'A') || (O[t] == 'G') ||  (O[t] == 'T'))) {
 
-                alpha[S_STATE][t] = max_dbl;
-                alpha[S_STATE][t+1] = max_dbl;
+                alpha[S_STATE][t] = DBL_MAX;
+                alpha[S_STATE][t+1] = DBL_MAX;
                 alpha[S_STATE][t+2] = alpha[R_STATE][t-1] - (hmm_ptr->tr[TR_RS]);
                 path[S_STATE][t] = R_STATE;
                 path[S_STATE][t+1] = S_STATE;
@@ -664,7 +664,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
         /**********************************************/
         if (alpha[E_STATE_1][t] == 0) {
 
-            alpha[E_STATE_1][t] = max_dbl;
+            alpha[E_STATE_1][t] = DBL_MAX;
             path[E_STATE_1][t] = NOSTATE;
 
             if (t < len_seq - 2 && (O[t] == 'C') && (O[t+1] == 'A') &&
@@ -673,8 +673,8 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 /* transition from frame6 */
                 alpha[E_STATE_1][t+2] = alpha[M6_STATE_1][t-1] - (hmm_ptr->tr[TR_GE]);
                 path[E_STATE_1][t] = M6_STATE_1;
-                alpha[E_STATE_1][t] = max_dbl;
-                alpha[E_STATE_1][t+1] = max_dbl;
+                alpha[E_STATE_1][t] = DBL_MAX;
+                alpha[E_STATE_1][t+1] = DBL_MAX;
                 path[E_STATE_1][t+1] = E_STATE_1;
                 path[E_STATE_1][t+2] = E_STATE_1;
 
@@ -727,7 +727,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
             for (i = 0; i < NUM_STATE; i++) {
                 if (i!=R_STATE) {
-                    alpha[i][t] = max_dbl;
+                    alpha[i][t] = DBL_MAX;
                     path[i][t] = R_STATE;
                 }
             }
@@ -745,7 +745,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     sprintf(output_buffer, "%s\n", sequence_head);
 
     /* find the state for O[N] with the highest probability */
-    prob = max_dbl;
+    prob = DBL_MAX;
     for (i = 0; i < NUM_STATE; i++) {
 
         if (alpha[i][len_seq-1] < prob) {

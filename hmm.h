@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <float.h>
 #include <math.h>
 #include <pthread.h>
 #include <semaphore.h>
@@ -23,7 +24,6 @@
 
 #define DONE_Q 0
 #define EMPTY_Q 1
-#define max_dbl 10000000000.0
 
 #define LOG_53 -0.63487827243
 #define LOG_16 -1.83258146375
