@@ -73,8 +73,38 @@ void parseArguments(int argc, char **argv) {
 
     int c;
 
-    while ((c = getopt(argc, argv, "fs:m:o:w:r:t:p:dev")) != -1) {
+    while ((c = getopt(argc, argv, "fdem:o:p:r:s:t:vw:")) != -1) {
         switch (c) {
+        case 'f':
+            format = true;
+            break;
+        case 'd':
+            output_dna = true;
+            break;
+        case 'e':
+            output_meta = true;
+            break;
+        case 'm':
+            max_mem = atoi(optarg);
+            break;
+        case 'o':
+            strcpy(out_file, optarg);
+            strcpy(aa_file, out_file);
+            strcat(aa_file, ".faa");
+            strcpy(dna_file, out_file);
+            strcat(dna_file, ".ffn");
+            break;
+        case 'p':
+            threadnum = atoi(optarg);
+            if (threadnum < 1) {
+                fprintf(stderr, "ERROR: An incorrect value [%d] for the option -p was entered\n", threadnum);
+                print_usage();
+                exit(EXIT_FAILURE);
+            }
+            break;
+        case 'r':
+            setTrainDirectory(optarg);
+            break;
         case 's':
             strcpy(seq_file, optarg);
 
@@ -86,35 +116,6 @@ void parseArguments(int argc, char **argv) {
                 exit(EXIT_FAILURE);
             }
             break;
-        case 'm':
-            max_mem = atoi(optarg);
-            break;
-        case 'w':
-            wholegenome = atoi(optarg);
-            if (wholegenome != 0 && wholegenome != 1) {
-                fprintf(stderr, "ERROR: An incorrect value for the option -w was entered\n");
-                print_usage();
-                exit(EXIT_FAILURE);
-            }
-            break;
-        case 'p':
-            threadnum = atoi(optarg);
-            if (threadnum < 1) {
-                fprintf(stderr, "ERROR: An incorrect value [%d] for the option -p was entered\n", threadnum);
-                print_usage();
-                exit(EXIT_FAILURE);
-            }
-            break;
-        case 'o':
-            strcpy(out_file, optarg);
-            strcpy(aa_file, out_file);
-            strcat(aa_file, ".faa");
-            strcpy(dna_file, out_file);
-            strcat(dna_file, ".ffn");
-            break;
-        case 'r':
-            setTrainDirectory(optarg);
-            break;
         case 't':
             strcpy(train_file, optarg);
             strcpy(hmm_file, train_dir);
@@ -125,26 +126,18 @@ void parseArguments(int argc, char **argv) {
                 exit(EXIT_FAILURE);
             }
             break;
-        case 'f':
-            format = true;
-            break;
-        case 'd':
-            output_dna = true;
-            break;
-        case 'e':
-            output_meta = true;
-            break;
         case 'v':
             verbose = true;
             break;
-        }
-    }
-
-    optind = 1;
-    while ((c=getopt(argc, argv, "fs:m:o:w:r:t:p:dev")) != -1) {
-        switch (c) {
-        case 'r':
-            setTrainDirectory(optarg);
+        case 'w':
+            wholegenome = atoi(optarg);
+            if (wholegenome != 0 && wholegenome != 1) {
+                fprintf(stderr, "ERROR: An incorrect value for the option -w was entered\n");
+                print_usage();
+                exit(EXIT_FAILURE);
+            }
+            break;
+        default:
             break;
         }
     }
