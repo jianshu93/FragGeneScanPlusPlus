@@ -264,9 +264,9 @@ void free_hmm(HMM *hmm);
  * @param dna The string we want to take the reverse-complement of.
  * @param[out] rc_dna The output buffer for the reverse-complement.
  */
-void get_rc_dna(char *dna, char *rc_dna);
+void get_rc_dna(char *dna, int dna_len, char *rc_dna);
 
-void get_rc_dna_indel(char* dna_f, char* dna_f1);
+void get_rc_dna_indel(char* dna_f, int dna_len, char* dna_f1);
 void get_corrected_dna(char *dna, char *dna_f);
 void print_usage();
 
@@ -311,7 +311,7 @@ void print_usage();
 void print_outputs(int codon_start, int start_t, int end_t, int frame,
                    char* output_buffer, char* aa_buffer, char* dna_buffer,
                    char* sequence_head_short,
-                   char* dna, char* rc_dna, char* dna_f, char* rc_dna_f, char* protein,
+                   char* dna, int dna_len, char* rc_dna, char* dna_f, char* rc_dna_f, char* protein,
                    int* insertions, int* deletions, int insertions_len, int deletions_len,
                    bool format, char* temp_str_ptr, unsigned int multiple);
 

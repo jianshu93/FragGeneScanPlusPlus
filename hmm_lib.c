@@ -36,7 +36,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     /* initialize                                                  */
     /***************************************************************/
 
-    for (i =0; i < strlen(O); i++) {
+    for (i =0; i < len_seq; i++) {
         if ( O[i]=='a' ) O[i]='A';
         if ( O[i]=='t' ) O[i]='T';
         if ( O[i]=='c' ) O[i]='C';
@@ -827,7 +827,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
             if (dna_id > gene_len) {
                 print_outputs(codon_start, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
-                              dna, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
+                              dna, len_seq, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
                 multiple++;
             }
 
@@ -947,7 +947,7 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
 
     /* Transition */
     fscanf(fp, "%s", head);
-    for (i = 0; i < 14; i++) {
+    for (i = 0; i < NUM_TRANSITIONS; i++) {
         //!! This causes a memory leak for unknown reasons.
         fscanf(fp, "%s %lf", name, &prob);
         hmm_ptr->tr[tr2int(name)] = log(prob);
@@ -1113,7 +1113,7 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
 }
 
 void print_outputs(int codon_start, int start_t, int end_t, int frame, char *output_buffer, char *aa_buffer, char *dna_buffer,
-                   char *sequence_head_short, char *dna, char *rc_dna, char *dna_f, char *rc_dna_f, char *protein,
+                   char *sequence_head_short, char *dna, int dna_len, char *rc_dna, char *dna_f, char *rc_dna_f, char *protein,
                    int *insertions, int *deletions, int insertions_len, int deletions_len, bool format, char *temp_str_ptr, unsigned int multiple) {
     int i;
     char strand_sign = (codon_start == 1)? '+' : '-';
@@ -1141,7 +1141,7 @@ void print_outputs(int codon_start, int start_t, int end_t, int frame, char *out
         strcat(aa_buffer, "\t");
     sprintf(temp_str_ptr, "%s_%d_%d_%c\n", sequence_head_short, start_t, end_t, strand_sign);
     strcat(aa_buffer, temp_str_ptr);
-    get_protein(dna, protein, codon_start);
+    get_protein(dna, dna_len, protein, codon_start);
     sprintf(temp_str_ptr, "%s\n", protein);
     strcat(aa_buffer, temp_str_ptr);
 
@@ -1152,8 +1152,8 @@ void print_outputs(int codon_start, int start_t, int end_t, int frame, char *out
     if (codon_start == 1) {
         sprintf(temp_str_ptr, "%s\n", (format)? dna_f : dna);
     } else {
-        get_rc_dna(dna, rc_dna);
-        get_rc_dna_indel(dna_f, rc_dna_f);
+        get_rc_dna(dna, dna_len, rc_dna);
+        get_rc_dna_indel(dna_f, dna_len, rc_dna_f);
         sprintf(temp_str_ptr, "%s\n", (format)? rc_dna_f : rc_dna);
     }
     strcat(dna_buffer, temp_str_ptr);

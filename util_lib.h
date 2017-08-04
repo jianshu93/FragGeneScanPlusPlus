@@ -22,7 +22,15 @@ int nt2int (char nt);
 int nt2int_rc (char nt);
 
 int trinucleotide (char a, char b, char c);
-void get_protein(char *dna, char *protein, int strand);
+
+/**
+ * Translates the given DNA sequence.
+ *
+ * @param dna The sequence we want to translate.
+ * @param[out] protein The output buffer for the protein.
+ * @param strand What strand to translate.
+ */
+void get_protein(char *dna, int dna_len, char *protein, int strand);
 void print_usage();
 
 typedef struct q {

@@ -320,8 +320,8 @@ int trinucleotide_pep (char a, char b, char c) {
 }
 
 // Calculates the reverse complement of the bases in `dna` and saves it in `reverse_complement`
-void get_rc_dna(char *dna, char *reverse_complement) {
-    int i, dna_len = strlen(dna);
+void get_rc_dna(char *dna, int dna_len, char *reverse_complement) {
+    int i;
 
     for (i = 0; i < dna_len; i++) {
         char rc;
@@ -345,8 +345,8 @@ void get_rc_dna(char *dna, char *reverse_complement) {
     }
 }
 
-void get_rc_dna_indel(char *dna, char *dna1) {
-    int i, dna_len = strlen(dna);
+void get_rc_dna_indel(char *dna, int dna_len, char *dna1) {
+    int i;
 
     for (i = 0; i < dna_len; i++) {
         char rc;
@@ -379,7 +379,7 @@ void get_rc_dna_indel(char *dna, char *dna1) {
 }
 
 
-void get_protein(char *dna, char *protein,  int strand) {
+void get_protein(char *dna, int dna_len, char *protein,  int strand) {
 
     int i;
     char codon_code[65] = {'K','N','K','N',
@@ -417,7 +417,6 @@ void get_protein(char *dna, char *protein,  int strand) {
                                 'S','A','P','T',
                                 '*','E','Q','K','X'
                                };
-    int dna_len = strlen(dna);
     int protein_len = dna_len/3;
 
     if (strand ==1) {
