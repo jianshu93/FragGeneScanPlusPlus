@@ -1,6 +1,7 @@
 #include "hmm.h"
 #include "util_lib.h"
 #include "fasta.h"
+#include "translation_tables.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -72,8 +73,9 @@ void parseArguments(int argc, char **argv) {
     }
 
     int c;
+    int translation_table_id = 11;
 
-    while ((c = getopt(argc, argv, "fdem:o:p:r:s:t:vw:")) != -1) {
+    while ((c = getopt(argc, argv, "fdem:o:p:r:s:t:vw:x:")) != -1) {
         switch (c) {
         case 'f':
             format = true;
@@ -137,8 +139,16 @@ void parseArguments(int argc, char **argv) {
                 exit(EXIT_FAILURE);
             }
             break;
+        case 'x':
+            translation_table_id = atoi(optarg);
+            break;
         default:
             break;
+        }
+
+        if (!parse_translation_tables(translation_table_id, translation_table, translation_table_rc)) {
+            fprintf(stderr, "ERROR: No translation table with number %s\n", optarg);
+            exit(EXIT_FAILURE);
         }
     }
 }

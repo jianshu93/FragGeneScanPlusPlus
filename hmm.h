@@ -117,6 +117,9 @@ typedef enum {
     TR_ES1,
 } HMM_StateTransition;
 
+char *translation_table[65];
+char *translation_table_rc[65];
+
 // semaphores
 #ifdef __APPLE__
 typedef sem_t* SEM_T;

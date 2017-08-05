@@ -379,54 +379,18 @@ void get_rc_dna_indel(char *dna, int dna_len, char *dna1) {
 }
 
 
-void get_protein(char *dna, int dna_len, char *protein,  int strand) {
-
+void get_protein(char *dna, int dna_len, char *protein, int strand) {
     int i;
-    char codon_code[65] = {'K','N','K','N',
-                           'T','T','T','T',
-                           'R','S','R','S',
-                           'I','I','M','I',
-                           'Q','H','Q','H',
-                           'P','P','P','P',
-                           'R','R','R','R',
-                           'L','L','L','L',
-                           'E','D','E','D',
-                           'A','A','A','A',
-                           'G','G','G','G',
-                           'V','V','V','V',
-                           '*','Y','*','Y',
-                           'S','S','S','S',
-                           '*','C','W','C',
-                           'L','F','L','F', 'X'
-                          };
-
-    char anti_codon_code[65] = {'F','V','L','I',
-                                'C','G','R','S',
-                                'S','A','P','T',
-                                'Y','D','H','N',
-                                'L','V','L','M',
-                                'W','G','R','R',
-                                'S','A','P','T',
-                                '*','E','Q','K',
-                                'F','V','L','I',
-                                'C','G','R','S',
-                                'S','A','P','T',
-                                'Y','D','H','N',
-                                'L','V','L','I',
-                                '*','G','R','R',
-                                'S','A','P','T',
-                                '*','E','Q','K','X'
-                               };
 
     /* If our DNA sequence is not a multiple of 3, throw away the last nucleotides */
     dna_len -= dna_len % 3;
 
     if (strand ==1) {
         for (i = 0; i < dna_len; i += 3)
-            protein[i/3] = codon_code[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
+            protein[i/3] = (*translation_table)[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
     } else {
         for (i = 0; i < dna_len; i += 3)
-            protein[(dna_len-i)/3-1] = anti_codon_code[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
+            protein[(dna_len-i)/3-1] = (*translation_table_rc)[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
     }
 }
 
@@ -462,6 +426,7 @@ void print_usage() {
     printf("%s", "       -e [1 or 0]         Output metadata for sequences.\n");
     printf("%s", "       -d [1 or 0]         Output DNA file.\n");
     printf("%s", "       -m [max_mem_usage]  Maximum amount of memory to be used by the application, in megabytes, default 1024 for 1GB\n");
+    printf("%s", "       -x [translation_table]  Which translation table to use (default: 11)\n");
 
 }
 
