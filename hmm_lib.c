@@ -827,7 +827,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
             if (dna_id > gene_len) {
                 print_outputs(codon_start, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
-                              dna, len_seq, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
+                              dna, dna_id + 1, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
                 multiple++;
             }
 
@@ -889,7 +889,6 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     dna_f = 0;
     dna_f = 0;
     protein = 0;
-
 }
 
 void get_prob_from_cg(HMM *hmm_ptr, TRAIN *train_ptr, char *O, int len_seq) {

@@ -417,25 +417,16 @@ void get_protein(char *dna, int dna_len, char *protein,  int strand) {
                                 'S','A','P','T',
                                 '*','E','Q','K','X'
                                };
-    int protein_len = dna_len/3;
+
+    /* If our DNA sequence is not a multiple of 3, throw away the last nucleotides */
+    dna_len -= dna_len % 3;
 
     if (strand ==1) {
-
-        for (i=0; i<dna_len; i+=3) {
+        for (i = 0; i < dna_len; i += 3)
             protein[i/3] = codon_code[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
-        }
     } else {
-
-        if (dna_len % 3 == 2) {
-            dna_len -= 2;
-        } else if (dna_len % 3 == 1) {
-            dna_len -= 1;
-        }
-
-        for (i=0; i<dna_len; i+=3) {
+        for (i = 0; i < dna_len; i += 3)
             protein[(dna_len-i)/3-1] = anti_codon_code[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
-            protein_len --;
-        }
     }
 }
 
