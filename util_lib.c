@@ -157,41 +157,37 @@ void free_imatrix(int **m) {
 }
 
 
-int tr2int (char *tr) {
+HMM_StateTransition hmm_state_transition_parse (char *tr) {
+    if (strcmp(tr, "MM") == 0)
+        return TR_MM;
+    if (strcmp(tr, "MI") == 0)
+        return TR_MI;
+    if (strcmp(tr, "MD") == 0)
+        return TR_MD;
+    if (strcmp(tr, "II") == 0)
+        return TR_II;
+    if (strcmp(tr, "IM") == 0)
+        return TR_IM;
+    if (strcmp(tr, "DD") == 0)
+        return TR_DD;
+    if (strcmp(tr, "DM") == 0)
+        return TR_DM;
+    if (strcmp(tr, "GE") == 0)
+        return TR_GE;
+    if (strcmp(tr, "GG") == 0)
+        return TR_GG;
+    if (strcmp(tr, "ER") == 0)
+        return TR_ER;
+    if (strcmp(tr, "RS") == 0)
+        return TR_RS;
+    if (strcmp(tr, "RR") == 0)
+        return TR_RR;
+    if (strcmp(tr, "ES") == 0)
+        return TR_ES;
+    if (strcmp(tr, "ES1") == 0)
+        return TR_ES;
 
-    int result;
-
-    if      (strcmp(tr, "MM")  == 0) {
-        result = 0;
-    } else if (strcmp(tr, "MI")  == 0) {
-        result = 1;
-    } else if (strcmp(tr, "MD")  == 0) {
-        result = 2;
-    } else if (strcmp(tr, "II")  == 0) {
-        result = 3;
-    } else if (strcmp(tr, "IM")  == 0) {
-        result = 4;
-    } else if (strcmp(tr, "DD")  == 0) {
-        result = 5;
-    } else if (strcmp(tr, "DM")  == 0) {
-        result = 6;
-    } else if (strcmp(tr, "GE")  == 0) {
-        result = 7;
-    } else if (strcmp(tr, "GG")  == 0) {
-        result = 8;
-    } else if (strcmp(tr, "ER")  == 0) {
-        result = 9;
-    } else if (strcmp(tr, "RS")  == 0) {
-        result = 10;
-    } else if (strcmp(tr, "RR")  == 0) {
-        result = 11;
-    } else if (strcmp(tr, "ES")  == 0) {
-        result = 12;   /* ES: E+ -> S+, E- -> S- */
-    } else if (strcmp(tr, "ES1") == 0) {
-        result = 13;   /* ES1: E+ -> S-, E- -> S+ */
-    }
-
-    return result;
+    return -1;
 }
 
 Nucleotide nucleotide_parse (char nt) {

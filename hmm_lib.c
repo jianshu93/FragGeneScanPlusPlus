@@ -940,7 +940,7 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
     for (i = 0; i < NUM_TRANSITIONS; i++) {
         //!! This causes a memory leak for unknown reasons.
         fscanf(fp, "%s %lf", name, &prob);
-        hmm_ptr->tr[tr2int(name)] = log(prob);
+        hmm_ptr->tr[hmm_state_transition_parse(name)] = log(prob);
     }
 
     /* TransitionMI */

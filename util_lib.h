@@ -17,7 +17,7 @@ int *ivector(int nh);
 void free_dmatrix(double **m);
 void free_imatrix(int **m);
 
-int tr2int (char *nt);
+HMM_StateTransition hmm_state_transition_parse (char *nt);
 
 /**
  * Parses the given character as a nucleotide.
