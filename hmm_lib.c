@@ -9,7 +9,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     int **path;                          // viterbi path array
     double **alpha;                      // viterbi prob array
     int i, j, t, kk;
-    int from, from0, to;   /*from0: i-2 position, from: i-1 position */
+    Nucleotide from, from0, to;   /*from0: i-2 position, from: i-1 position */
     int from2;             /* from2: i-2, i-1 for condition in probability */
     int gene_len;
     int num_d;          		/* the number of delete */
@@ -110,14 +110,12 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
         to = sequence[t];
 
         /* if DNA is other than ACGT, do it later */
-        if (from == 4) {
-            from = 2;
-        }
-        if (from0 == 4) {
-            from0 = 2;
-        }
-        if (to == 4) {
-            to = 2;
+        if (from == NUCL_INVALID)
+            from = NUCL_G;
+        if (from0 == NUCL_INVALID)
+            from0 = NUCL_G;
+        if (to == NUCL_INVALID) {
+            to = NUCL_G;
             num_N += 1;
         } else {
             num_N = 0;
@@ -823,7 +821,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
             if (dna_id > gene_len) {
                 print_outputs(codon_start, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
-                              dna, dna_id + 1, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
+                              dna, dna_id + 1, sequence, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
                 multiple++;
             }
 
@@ -1108,7 +1106,7 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
 }
 
 void print_outputs(int codon_start, int start_t, int end_t, int frame, char *output_buffer, char *aa_buffer, char *dna_buffer,
-                   char *sequence_head_short, char *dna, int dna_len, char *rc_dna, char *dna_f, char *rc_dna_f, char *protein,
+                   char *sequence_head_short, char *dna, int dna_len, Nucleotide dna_seq[], char *rc_dna, char *dna_f, char *rc_dna_f, char *protein,
                    int *insertions, int *deletions, int insertions_len, int deletions_len, bool format, char *temp_str_ptr, unsigned int multiple) {
     int i;
     char strand_sign = (codon_start == 1)? '+' : '-';
@@ -1136,7 +1134,7 @@ void print_outputs(int codon_start, int start_t, int end_t, int frame, char *out
         strcat(aa_buffer, "\t");
     sprintf(temp_str_ptr, "%s_%d_%d_%c\n", sequence_head_short, start_t, end_t, strand_sign);
     strcat(aa_buffer, temp_str_ptr);
-    get_protein(dna, dna_len, protein, codon_start);
+    get_protein(dna_seq, dna_len, protein, codon_start);
     sprintf(temp_str_ptr, "%s\n", protein);
     strcat(aa_buffer, temp_str_ptr);
 

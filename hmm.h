@@ -284,7 +284,9 @@ void print_usage();
  * @param start_t The start position of the gene.
  * @param end_t The ending position of the gene.
  * @param frame The frame number.
- * @param dna The nucleotide sequence of the gene (on the sense strand).
+ * @param dna The complete DNA input string.
+ * @param dna_seq The complete DNA nucleotide sequence.
+ * @param dna_len The length of `dna`and `dna_seq`.
  * @param dna_f The (supposedly?) formatted nucleotide sequence of the gene (on the sense strand).
  * @param insertions The list of the insertions
  * @param insertions_len The length of `insertions`
@@ -312,11 +314,11 @@ void print_usage();
  * @param temp_str_ptr General-purpose string buffer
  */
 void print_outputs(int codon_start, int start_t, int end_t, int frame,
-                   char* output_buffer, char* aa_buffer, char* dna_buffer,
-                   char* sequence_head_short,
-                   char* dna, int dna_len, char* rc_dna, char* dna_f, char* rc_dna_f, char* protein,
-                   int* insertions, int* deletions, int insertions_len, int deletions_len,
-                   bool format, char* temp_str_ptr, unsigned int multiple);
+                   char *output_buffer, char *aa_buffer, char *dna_buffer,
+                   char *sequence_head_short,
+                   char *dna, int dna_len, Nucleotide dna_seq[], char *rc_dna, char* dna_f, char *rc_dna_f, char *protein,
+                   int *insertions, int *deletions, int insertions_len, int deletions_len,
+                   bool format, char *temp_str_ptr, unsigned int multiple);
 
 // helper functions to cleanup the main function
 void setTrainDirectory(char* train_path);

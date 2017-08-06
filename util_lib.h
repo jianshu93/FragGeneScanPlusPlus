@@ -29,16 +29,20 @@ Nucleotide nucleotide_parse (char nt);
  */
 Nucleotide nucleotide_complement (Nucleotide nt);
 
+/**
+ * Returns the trinucleotide from combining the given nucleotides.
+ */
 int trinucleotide (Nucleotide a, Nucleotide b, Nucleotide c);
 
 /**
  * Translates the given DNA sequence.
  *
  * @param dna The sequence we want to translate.
+ * @param dna The length of the sequence.
  * @param[out] protein The output buffer for the protein.
  * @param strand What strand to translate.
  */
-void get_protein(char *dna, int dna_len, char *protein, int strand);
+void get_protein(Nucleotide dna[], int dna_len, char *protein, int strand);
 void print_usage();
 
 typedef struct q {
