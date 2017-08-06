@@ -1,12 +1,7 @@
 #include "hmm.h"
-#include "util_lib.h"
-#include "fasta.h"
-#include "translation_tables.h"
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-
 #include "run_hmm.h"
+#include "translation_tables.h"
+#include "util_lib.h"
 
 /* User-specified options */
 bool format = false;

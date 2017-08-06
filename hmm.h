@@ -7,20 +7,19 @@
 #ifndef __HMM_H
 #define __HMM_H
 
-#include <ctype.h>
-#include <ctype.h>
 #include <fcntl.h>
 #include <float.h>
 #include <math.h>
 #include <pthread.h>
 #include <semaphore.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
 #include "fasta.h"
+
 
 /** The queue for worker threads that are waiting for the writer thread */
 #define DONE_Q 0
