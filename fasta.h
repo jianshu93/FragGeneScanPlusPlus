@@ -84,6 +84,7 @@
  */
 #define STRINGLEN 1000000
 
+/** A FASTA-formatted file */
 typedef struct {
     /** The file pointer to the FASTA file */
     FILE *fp;
@@ -108,9 +109,9 @@ FastaFile *fasta_file_new(char *seqfile);
  * @param[out] out_header An unallocated buffer to contain the header. Freed by the caller.
  * @param[out] out_seq_len Will be filled with the length of the sequence.
  *
- * @returns 1 if more sequences can be read in the file, 0 otherwise.
+ * @returns true if more sequences can be read in the file, false otherwise.
  */
-int fasta_file_read_record(FastaFile *fp, char **out_seq, char **out_name, int *out_L);
+bool fasta_file_read_record(FastaFile *fp, char **out_seq, char **out_name, int *out_L);
 
 /**
  * Frees the resource for the FastaFile.

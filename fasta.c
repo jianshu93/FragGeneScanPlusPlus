@@ -33,18 +33,18 @@ FastaFile *fasta_file_new(char *seqfile) {
     return ffp;
 }
 
-int fasta_file_read_record(FastaFile *ffp, char **out_seq, char **out_header, int *out_seq_len) {
+bool fasta_file_read_record(FastaFile *ffp, char **out_seq, char **out_header, int *out_seq_len) {
     char *s, *header, *seq;
     int n, nalloc;
 
     /* Peek at the lookahead buffer; check if it's a valid FASTA header. */
     if (ffp->buffer[0] != '>')
-        return 0;
+        return false;
 
     /* Parse out the header */
     s  = strtok(ffp->buffer+1, "\n");
     if (s == NULL)
-        return 0;
+        return false;
 
     header = malloc(sizeof(char) * (strlen(s)+1));
     strcpy(header, s);
@@ -78,7 +78,7 @@ int fasta_file_read_record(FastaFile *ffp, char **out_seq, char **out_header, in
     *out_header = header;
     *out_seq = seq;
     *out_seq_len = n;
-    return 1;
+    return true;
 }
 
 void fasta_file_free(FastaFile *ffp) {
