@@ -276,7 +276,6 @@ void free_hmm(HMM *hmm);
 void get_rc_dna(Nucleotide dna[], int dna_len, char *rc_dna);
 
 void get_rc_dna_indel(char* dna_f, int dna_len, char* dna_f1);
-void get_corrected_dna(char *dna, char *dna_f);
 void print_usage();
 
 /**
