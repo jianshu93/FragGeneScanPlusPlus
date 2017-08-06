@@ -209,26 +209,25 @@ int tr2int (char *tr) {
     return result;
 }
 
+Nucleotide nucleotide_parse (char nt) {
+    if (nt == 'A' || nt == 'a')
+        return NUCL_A;
+    if (nt == 'C' || nt == 'c')
+        return NUCL_C;
+    if (nt == 'G' || nt == 'g')
+        return NUCL_G;
+    if (nt == 'T' || nt == 't')
+        return NUCL_T;
 
-int nt2int (char nt) {
-
-    int result;
-
-    if      (nt == 'A' || nt == 'a') {
-        result = 0;
-    } else if (nt == 'C' || nt == 'c') {
-        result = 1;
-    } else if (nt == 'G' || nt == 'g') {
-        result = 2;
-    } else if (nt == 'T' || nt == 't') {
-        result = 3;
-    } else                            {
-        result = 4;
-    }
-
-    return result;
+    return NUCL_INVALID;
 }
 
+Nucleotide nucleotide_complement (Nucleotide nt) {
+    if (nt == NUCL_INVALID)
+        return NUCL_INVALID;
+
+    return 3 - nt;
+}
 
 int trinucleotide (Nucleotide a, Nucleotide b, Nucleotide c) {
     if (c == NUCL_INVALID)

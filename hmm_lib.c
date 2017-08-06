@@ -36,7 +36,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     /* Parse the sequence */
     Nucleotide sequence[len_seq];
     for (i = 0; i < len_seq; i++)
-        sequence[i] = nt2int(O[i]);
+        sequence[i] = nucleotide_parse(O[i]);
 
     /***************************************************************/
     /* initialize                                                  */
@@ -952,14 +952,14 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
     fscanf(fp, "%s", head);
     for (i = 0; i < 16; i++) {
         fscanf(fp, "%s %s %lf\n", start, end, &prob);
-        hmm_ptr->tr_M_I[nt2int(start[0])][nt2int(end[0])] = log(prob);
+        hmm_ptr->tr_M_I[nucleotide_parse(start[0])][nucleotide_parse(end[0])] = log(prob);
     }
 
     /* TransitionII */
     fscanf(fp, "%s", head);
     for (i = 0; i < 16; i++) {
         fscanf(fp, "%s %s %lf", start, end, &prob);
-        hmm_ptr->tr_I_I[nt2int(start[0])][nt2int(end[0])] = log(prob);
+        hmm_ptr->tr_I_I[nucleotide_parse(start[0])][nucleotide_parse(end[0])] = log(prob);
     }
 
     /* PI */

@@ -18,8 +18,16 @@ void free_dmatrix(double **m);
 void free_imatrix(int **m);
 
 int tr2int (char *nt);
-int nt2int (char nt);
-int nt2int_rc (char nt);
+
+/**
+ * Parses the given character as a nucleotide.
+ */
+Nucleotide nucleotide_parse (char nt);
+
+/**
+ * Returns the reverse complement of the given nucleotide.
+ */
+Nucleotide nucleotide_complement (Nucleotide nt);
 
 int trinucleotide (Nucleotide a, Nucleotide b, Nucleotide c);
 
