@@ -21,7 +21,7 @@ int tr2int (char *nt);
 int nt2int (char nt);
 int nt2int_rc (char nt);
 
-int trinucleotide (char a, char b, char c);
+int trinucleotide (Nucleotide a, Nucleotide b, Nucleotide c);
 
 /**
  * Translates the given DNA sequence.

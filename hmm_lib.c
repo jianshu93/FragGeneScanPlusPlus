@@ -32,16 +32,15 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     int temp_i_1[6] = {1,1,1,1,1,1};
     int num_N = 0;
 
+
+    /* Parse the sequence */
+    Nucleotide sequence[len_seq];
+    for (i = 0; i < len_seq; i++)
+        sequence[i] = nt2int(O[i]);
+
     /***************************************************************/
     /* initialize                                                  */
     /***************************************************************/
-
-    for (i =0; i < len_seq; i++) {
-        if ( O[i]=='a' ) O[i]='A';
-        if ( O[i]=='t' ) O[i]='T';
-        if ( O[i]=='c' ) O[i]='C';
-        if ( O[i]=='g' ) O[i]='G';
-    }
 
     gene_len = (whole_genome)? 120 : 60;
 
@@ -54,8 +53,9 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     }
 
     /* stop state */
-    if ((O[0] == 'T') && (((O[1] == 'A') && (O[2] == 'A')) ||
-                          ((O[1] == 'A') && (O[2] == 'G')) || ((O[1] == 'G') && (O[2] == 'A')))) {
+    if ((sequence[0] == NUCL_T) && (((sequence[1] == NUCL_A) && (sequence[2] == NUCL_A)) ||
+                                    ((sequence[1] == NUCL_A) && (sequence[2] == NUCL_G)) ||
+                                    ((sequence[1] == NUCL_G) && (sequence[2] == NUCL_A)))) {
 
         alpha[E_STATE][0] = DBL_MAX;
         alpha[E_STATE][1] = DBL_MAX;
@@ -69,19 +69,19 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
         alpha[M2_STATE][1] = DBL_MAX;
         alpha[M1_STATE][0] = DBL_MAX;
 
-        if ((O[1] == 'A') && (O[2] == 'A')) {
+        if ((sequence[1] == NUCL_A) && (sequence[2] == NUCL_A)) {
             alpha[E_STATE][2] = alpha[E_STATE][2] - LOG_53;
-        } else if ((O[1] == 'A') && (O[2] == 'G')) {
+        } else if ((sequence[1] == NUCL_A) && (sequence[2] == NUCL_G)) {
             alpha[E_STATE][2] = alpha[E_STATE][2] - LOG_16;
-        } else if ((O[1] == 'G') && (O[2] == 'A')) {
+        } else if ((sequence[1] == NUCL_G) && (sequence[2] == NUCL_A)) {
             alpha[E_STATE][2] = alpha[E_STATE][2] - LOG_30;
         }
     }
 
-    if ((O[2] == 'A') &&
-            (((O[0] == 'T') && (O[1] == 'T')) ||
-             ((O[0] == 'C') && (O[1] == 'T')) ||
-             ((O[0] == 'T') && (O[1] == 'C')))) {
+    if ((sequence[2] == NUCL_A) &&
+            (((sequence[0] == NUCL_T) && (sequence[1] == NUCL_T)) ||
+             ((sequence[0] == NUCL_C) && (sequence[1] == NUCL_T)) ||
+             ((sequence[0] == NUCL_T) && (sequence[1] == NUCL_C)))) {
         alpha[S_STATE_1][0] = DBL_MAX;
         alpha[S_STATE_1][1] = DBL_MAX;
         alpha[S_STATE_1][2] = alpha[S_STATE][0];
@@ -91,11 +91,11 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
         alpha[M3_STATE_1][2] = DBL_MAX;
         alpha[M6_STATE_1][2] = DBL_MAX;
 
-        if ((O[0] == 'T') && (O[1] == 'T')) {
+        if ((sequence[0] == NUCL_T) && (sequence[1] == NUCL_T)) {
             alpha[S_STATE_1][2] = alpha[S_STATE_1][2] - LOG_53;
-        } else if ((O[0] == 'C') && (O[1] == 'T')) {
+        } else if ((sequence[0] == NUCL_C) && (sequence[1] == NUCL_T)) {
             alpha[S_STATE_1][2] = alpha[S_STATE_1][2] - LOG_16;
-        } else if ((O[0] == 'T') && (O[1] == 'C')) {
+        } else if ((sequence[0] == NUCL_T) && (sequence[1] == NUCL_C)) {
             alpha[S_STATE_1][2] = alpha[S_STATE_1][2] - LOG_30;
         }
     }
@@ -105,13 +105,9 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     /*  fill out the rest of the columns                              */
     /******************************************************************/
     for (t = 1; t < len_seq; t++) {
-        from = nt2int(O[t-1]);
-        if (t>1) {
-            from0 = nt2int(O[t-2]);
-        } else {
-            from0 = 2;
-        }
-        to = nt2int(O[t]);
+        from = sequence[t-1];
+        from0 = (t > 1)? sequence[t-2] : NUCL_G;
+        to = sequence[t];
 
         /* if DNA is other than ACGT, do it later */
         if (from == 4) {
@@ -217,15 +213,15 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
                     /* to aviod stop codon */
                     if (t<2) {
-                    } else if ((i==M2_STATE || i==M5_STATE) && (O[temp_i[j-I1_STATE]] == 'T') &&
-                               (((O[t] == 'A') && (O[t+1] =='A')) ||
-                                ((O[t] == 'A') && (O[t+1] =='G')) ||
-                                ((O[t] == 'G') && (O[t+1] =='A')))) {
+                    } else if ((i==M2_STATE || i==M5_STATE) && (sequence[temp_i[j-I1_STATE]] == NUCL_T) &&
+                               (((sequence[t] == NUCL_A) && (sequence[t+1] ==NUCL_A)) ||
+                                ((sequence[t] == NUCL_A) && (sequence[t+1] ==NUCL_G)) ||
+                                ((sequence[t] == NUCL_G) && (sequence[t+1] ==NUCL_A)))) {
 
-                    } else if (((j-I1_STATE > 0) && (temp_i[j-I1_STATE]>0)) && ((i==M3_STATE || i==M6_STATE) && (O[temp_i[j-I1_STATE]-1] == 'T') &&
-                               (((O[temp_i[j-I1_STATE]] == 'A') && (O[t] =='A')) ||
-                                ((O[temp_i[j-I1_STATE]] == 'A') && (O[t] =='G')) ||
-                                ((O[temp_i[j-I1_STATE]] == 'G') && (O[t] =='A'))))) {
+                    } else if (((j-I1_STATE > 0) && (temp_i[j-I1_STATE]>0)) && ((i==M3_STATE || i==M6_STATE) && (sequence[temp_i[j-I1_STATE]-1] == NUCL_T) &&
+                               (((sequence[temp_i[j-I1_STATE]] == NUCL_A) && (sequence[t] ==NUCL_A)) ||
+                                ((sequence[temp_i[j-I1_STATE]] == NUCL_A) && (sequence[t] ==NUCL_G)) ||
+                                ((sequence[temp_i[j-I1_STATE]] == NUCL_G) && (sequence[t] ==NUCL_A))))) {
                     } else {
                         temp_alpha = alpha[j][t-1]  - (hmm_ptr->tr[TR_IM]) - LOG_25;
                         if ( temp_alpha < alpha[i][t]) {
@@ -273,9 +269,9 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
         for (i = M1_STATE_1; i <= M6_STATE_1; i++)   {
             if  ((i==M1_STATE_1 || i==M4_STATE_1)&& t>=3 &&
-                    (((O[t-3] == 'T') && (O[t-2] == 'T') && (O[t-1] == 'A')) ||
-                     ((O[t-3] == 'C') && (O[t-2] == 'T') && (O[t-1] == 'A')) ||
-                     ((O[t-3] == 'T') && (O[t-2] == 'C') && (O[t-1] == 'A')))) {
+                    (((sequence[t-3] == NUCL_T) && (sequence[t-2] == NUCL_T) && (sequence[t-1] == NUCL_A)) ||
+                     ((sequence[t-3] == NUCL_C) && (sequence[t-2] == NUCL_T) && (sequence[t-1] == NUCL_A)) ||
+                     ((sequence[t-3] == NUCL_T) && (sequence[t-2] == NUCL_C) && (sequence[t-1] == NUCL_A)))) {
 
                 /* from Start state  since this is actually stop codon in minus strand */
                 alpha[i][t] = alpha[S_STATE_1][t-1] -
@@ -362,17 +358,17 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                     if (t<2) {
                     } else  if ((i==M2_STATE_1 ||
                                  i==M5_STATE_1) &&
-                                (O[t+1] == 'A' ) &&
-                                (((O[temp_i_1[j-I1_STATE_1]] == 'T') && (O[t] =='T')) ||
-                                 ((O[temp_i_1[j-I1_STATE_1]] == 'C') && (O[t] =='T')) ||
-                                 ((O[temp_i_1[j-I1_STATE_1]] == 'T') && (O[t] =='C')))) {
+                                (sequence[t+1] == NUCL_A ) &&
+                                (((sequence[temp_i_1[j-I1_STATE_1]] == NUCL_T) && (sequence[t] ==NUCL_T)) ||
+                                 ((sequence[temp_i_1[j-I1_STATE_1]] == NUCL_C) && (sequence[t] ==NUCL_T)) ||
+                                 ((sequence[temp_i_1[j-I1_STATE_1]] == NUCL_T) && (sequence[t] ==NUCL_C)))) {
 
                     } else if ((i==M3_STATE_1 ||
                                 i==M6_STATE_1) &&
-                               (O[t] == 'A' ) &&
-                               (((O[temp_i_1[j-I1_STATE_1]-1] == 'T') && (O[temp_i_1[j-I1_STATE_1]] =='T')) ||
-                                ((O[temp_i_1[j-I1_STATE_1]-1] == 'C') && (O[temp_i_1[j-I1_STATE_1]] =='T')) ||
-                                ((O[temp_i_1[j-I1_STATE_1]-1] == 'T') && (O[temp_i_1[j-I1_STATE_1]] =='C')))) {
+                               (sequence[t] == NUCL_A ) &&
+                               (((sequence[temp_i_1[j-I1_STATE_1]-1] == NUCL_T) && (sequence[temp_i_1[j-I1_STATE_1]] ==NUCL_T)) ||
+                                ((sequence[temp_i_1[j-I1_STATE_1]-1] == NUCL_C) && (sequence[temp_i_1[j-I1_STATE_1]] ==NUCL_T)) ||
+                                ((sequence[temp_i_1[j-I1_STATE_1]-1] == NUCL_T) && (sequence[temp_i_1[j-I1_STATE_1]] ==NUCL_C)))) {
                     } else {
 
                         temp_alpha = alpha[j][t-1]  - (hmm_ptr->tr[TR_IM]) - LOG_25;
@@ -448,10 +444,10 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             alpha[E_STATE][t] = DBL_MAX;
             path[E_STATE][t] = NOSTATE;
 
-            if (t < len_seq -2 && (O[t] == 'T')  &&
-                    (((O[t+1] == 'A') && (O[t+2] == 'A')) ||
-                     ((O[t+1] == 'A') && (O[t+2] == 'G')) ||
-                     ((O[t+1] == 'G') && (O[t+2] == 'A')))) {
+            if (t < len_seq -2 && (sequence[t] == NUCL_T)  &&
+                    (((sequence[t+1] == NUCL_A) && (sequence[t+2] == NUCL_A)) ||
+                     ((sequence[t+1] == NUCL_A) && (sequence[t+2] == NUCL_G)) ||
+                     ((sequence[t+1] == NUCL_G) && (sequence[t+2] == NUCL_A)))) {
 
                 alpha[E_STATE][t+2] = DBL_MAX;
                 /* transition from frame4,frame5,and frame6 */
@@ -480,11 +476,11 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 alpha[M2_STATE][t+1] = DBL_MAX;
                 alpha[M1_STATE][t] = DBL_MAX;
 
-                if ((O[t+1] == 'A') && (O[t+2] == 'A')) {
+                if ((sequence[t+1] == NUCL_A) && (sequence[t+2] == NUCL_A)) {
                     alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - (0.54);
-                } else if ((O[t+1] == 'A') && (O[t+2] == 'G')) {
+                } else if ((sequence[t+1] == NUCL_A) && (sequence[t+2] == NUCL_G)) {
                     alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - LOG_16;
-                } else if ((O[t+1] == 'G') && (O[t+2] == 'A')) {
+                } else if ((sequence[t+1] == NUCL_G) && (sequence[t+2] == NUCL_A)) {
                     alpha[E_STATE][t+2] = alpha[E_STATE][t+2] - LOG_30;
                 }
 
@@ -496,13 +492,13 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 if (t>=60) { /* bug reported by Yu-Wei */
                     for (i = -60; i <= -3; i++) {
                         if (t+i+2 < len_seq) {
-                            start_freq -= (hmm_ptr->tr_E[i+60][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                            start_freq -= (hmm_ptr->tr_E[i+60][trinucleotide(sequence[t+i], sequence[t+i+1], sequence[t+i+2])]);
                         }
                     }
                 } else {
                     for (i = (-1*t); i <= -3; i++) {
                         if (t+i+2 < len_seq) {
-                            sub_sum += (hmm_ptr->tr_E[i+60][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                            sub_sum += (hmm_ptr->tr_E[i+60][trinucleotide(sequence[t+i], sequence[t+i+1], sequence[t+i+2])]);
                         }
                     }
                     sub_sum = sub_sum * 58 / (-3 + t + 1);
@@ -531,10 +527,10 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             path[S_STATE_1][t] = NOSTATE;
 
 
-            if (t<len_seq-2 && (O[t+2] == 'A') &&
-                    (((O[t] == 'T') && (O[t+1] == 'T')) ||
-                     ((O[t] == 'C') && (O[t+1] == 'T')) ||
-                     ((O[t] == 'T') && (O[t+1] == 'C')))) {
+            if (t<len_seq-2 && (sequence[t+2] == NUCL_A) &&
+                    (((sequence[t] == NUCL_T) && (sequence[t+1] == NUCL_T)) ||
+                     ((sequence[t] == NUCL_C) && (sequence[t+1] == NUCL_T)) ||
+                     ((sequence[t] == NUCL_T) && (sequence[t+1] == NUCL_C)))) {
 
                 alpha[S_STATE_1][t] = DBL_MAX;
                 path[S_STATE_1][t] = R_STATE;
@@ -558,11 +554,11 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 alpha[M3_STATE_1][t+2] = DBL_MAX;
                 alpha[M6_STATE_1][t+2] = DBL_MAX;
 
-                if ((O[t] == 'T') && (O[t+1] == 'T')) {
+                if ((sequence[t] == NUCL_T) && (sequence[t+1] == NUCL_T)) {
                     alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - (0.54);
-                } else if ((O[t] == 'C') && (O[t+1] == 'T')) {
+                } else if ((sequence[t] == NUCL_C) && (sequence[t+1] == NUCL_T)) {
                     alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - LOG_16;
-                } else if ((O[t] == 'T') && (O[t+1] == 'C')) {
+                } else if ((sequence[t] == NUCL_T) && (sequence[t+1] == NUCL_C)) {
                     alpha[S_STATE_1][t+2] = alpha[S_STATE_1][t+2] - LOG_30;
                 }
 
@@ -570,7 +566,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 start_freq=0;
                 for (i = 3; i <= 60; i++) {
                     if (t+i+2 < len_seq) {
-                        start_freq -= (hmm_ptr->tr_S_1[i-3][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                        start_freq -= (hmm_ptr->tr_S_1[i-3][trinucleotide(sequence[t+i], sequence[t+i+1], sequence[t+i+2])]);
                     }
                 }
                 h_kd = hmm_ptr->S1_dist[2] * exp(-1*pow(start_freq-hmm_ptr->S1_dist[1],2)/(2*pow(hmm_ptr->S1_dist[0],2)));
@@ -593,8 +589,8 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             alpha[S_STATE][t] = DBL_MAX;
             path[S_STATE][t] = NOSTATE;
 
-            if (t<len_seq-2 &&  (O[t+1] == 'T') && (O[t+2] == 'G')&&
-                    ((O[t] == 'A') || (O[t] == 'G') ||  (O[t] == 'T'))) {
+            if (t<len_seq-2 &&  (sequence[t+1] == NUCL_T) && (sequence[t+2] == NUCL_G)&&
+                    ((sequence[t] == NUCL_A) || (sequence[t] == NUCL_G) ||  (sequence[t] == NUCL_T))) {
 
                 alpha[S_STATE][t] = DBL_MAX;
                 alpha[S_STATE][t+1] = DBL_MAX;
@@ -616,11 +612,11 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 }
 
 
-                if (O[t] == 'A') {
+                if (sequence[t] == NUCL_A) {
                     alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - LOG_83;
-                } else if (O[t] == 'G') {
+                } else if (sequence[t] == NUCL_G) {
                     alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - LOG_10;
-                } else if (O[t] == 'T') {
+                } else if (sequence[t] == NUCL_T) {
                     alpha[S_STATE][t+2] = alpha[S_STATE][t+2] - LOG_07;
                 }
 
@@ -632,13 +628,13 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 if (t>=30) {
                     for (i = -30; i <= 30; i++) {
                         if (t+i+2 < len_seq) {
-                            start_freq -= (hmm_ptr->tr_S[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                            start_freq -= (hmm_ptr->tr_S[i+30][trinucleotide(sequence[t+i], sequence[t+i+1], sequence[t+i+2])]);
                         }
                     }
                 } else {
                     for (i = (-1*t); i <= 30; i++) {
                         if (t+i+2 < len_seq) {
-                            sub_sum += (hmm_ptr->tr_S[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                            sub_sum += (hmm_ptr->tr_S[i+30][trinucleotide(sequence[t+i], sequence[t+i+1], sequence[t+i+2])]);
                         }
                     }
                     sub_sum = sub_sum * 61 / (30 + t + 1);
@@ -667,8 +663,8 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             alpha[E_STATE_1][t] = DBL_MAX;
             path[E_STATE_1][t] = NOSTATE;
 
-            if (t < len_seq - 2 && (O[t] == 'C') && (O[t+1] == 'A') &&
-                    ((O[t+2] == 'T') || (O[t+2] == 'C') || (O[t+2] == 'A'))) {
+            if (t < len_seq - 2 && (sequence[t] == NUCL_C) && (sequence[t+1] == NUCL_A) &&
+                    ((sequence[t+2] == NUCL_T) || (sequence[t+2] == NUCL_C) || (sequence[t+2] == NUCL_A))) {
 
                 /* transition from frame6 */
                 alpha[E_STATE_1][t+2] = alpha[M6_STATE_1][t-1] - (hmm_ptr->tr[TR_GE]);
@@ -678,11 +674,11 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 path[E_STATE_1][t+1] = E_STATE_1;
                 path[E_STATE_1][t+2] = E_STATE_1;
 
-                if (O[t+2] == 'T') {
+                if (sequence[t+2] == NUCL_T) {
                     alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - LOG_83;
-                } else if (O[t+2] == 'C' ) {
+                } else if (sequence[t+2] == NUCL_C ) {
                     alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - LOG_10;
-                } else if (O[t+2] == 'A' ) {
+                } else if (sequence[t+2] == NUCL_A ) {
                     alpha[E_STATE_1][t+2] = alpha[E_STATE_1][t+2] - LOG_07;
                 }
 
@@ -694,13 +690,13 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 if (t>=30) {
                     for (i = -30; i <= 30; i++) {
                         if (t+i+2 < len_seq) {
-                            start_freq -= (hmm_ptr->tr_E_1[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                            start_freq -= (hmm_ptr->tr_E_1[i+30][trinucleotide(sequence[t+i], sequence[t+i+1], sequence[t+i+2])]);
                         }
                     }
                 } else {
                     for (i = (-1*t); i <= 30; i++) {
                         if (t+i+2 < len_seq) {
-                            sub_sum += (hmm_ptr->tr_E_1[i+30][trinucleotide(O[t+i], O[t+i+1], O[t+i+2])]);
+                            sub_sum += (hmm_ptr->tr_E_1[i+30][trinucleotide(sequence[t+i], sequence[t+i+1], sequence[t+i+2])]);
                         }
                     }
                     sub_sum = sub_sum * 61 / (30 + t + 1);
@@ -744,7 +740,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
     sprintf(output_buffer, "%s\n", sequence_head);
 
-    /* find the state for O[N] with the highest probability */
+    /* find the state for sequence[N] with the highest probability */
     prob = DBL_MAX;
     for (i = 0; i < NUM_STATE; i++) {
 
@@ -865,7 +861,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                    ((vpath[t] >= I1_STATE && vpath[t] <= I6_STATE) ||
                     (vpath[t] >= I1_STATE_1 && vpath[t] <= I6_STATE_1))) {
             dna_f_id ++;
-            dna_f[dna_f_id] = tolower(O[t]);
+            dna_f[dna_f_id] = tolower(sequence[t]);
             insert[insert_id] = t+1;
             insert_id++;
 

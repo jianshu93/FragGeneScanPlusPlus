@@ -230,47 +230,15 @@ int nt2int (char nt) {
 }
 
 
-int trinucleotide (char a, char b, char c) {
+int trinucleotide (Nucleotide a, Nucleotide b, Nucleotide c) {
+    if (c == NUCL_INVALID)
+        return 0;
+    if (b == NUCL_INVALID)
+        return c;
+    if (a == NUCL_INVALID)
+        return (b << 2) + c;
 
-    int freq_id;
-
-    if      (a == 'A' || a == 'a') {
-        freq_id = 0;
-    } else if (a == 'C' || a == 'c') {
-        freq_id = 16;
-    } else if (a == 'G' || a == 'g') {
-        freq_id = 32;
-    } else if (a == 'T' || a == 't') {
-        freq_id = 48;
-    } else {
-        freq_id = 0;
-    }
-
-    if      (b == 'A' || b == 'a') {
-        freq_id += 0;
-    } else if (b == 'C' || b == 'c') {
-        freq_id += 4;
-    } else if (b == 'G' || b == 'g') {
-        freq_id += 8;
-    } else if (b == 'T' || b == 't') {
-        freq_id += 12;
-    } else {
-        freq_id = 0;
-    }
-
-    if      (c == 'A' || c == 'a') {
-        freq_id += 0;
-    } else if (c == 'C' || c == 'c') {
-        freq_id += 1;
-    } else if (c == 'G' || c == 'g') {
-        freq_id += 2;
-    } else if (c == 'T' || c == 't') {
-        freq_id += 3;
-    } else {
-        freq_id = 0;
-    }
-
-    return freq_id;
+    return (a << 4) + (b << 2) + c;
 }
 
 int trinucleotide_pep (char a, char b, char c) {
