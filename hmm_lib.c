@@ -10,7 +10,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     double **alpha;                      // viterbi prob array
     int i, j, t, kk;
     Nucleotide from, from0, to;   /*from0: i-2 position, from: i-1 position */
-    int from2;             /* from2: i-2, i-1 for condition in probability */
+    int from2;  /* The dinucleotide combining `from` and `from0` */
     int gene_len;
     int num_d;          		/* the number of delete */
     double h_kd, r_kd, p_kd;
@@ -18,7 +18,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     double start_freq;
     double final_score;
 
-    int codon_start = 0;
+    Strand strand = UNKNOWN_STRAND;
     int dna_id = 0;
     int dna_f_id = 0;
     int out_nt;
@@ -756,14 +756,14 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
     for (t = 0; t < len_seq; t++) {
 
-        if (codon_start == 0 && start_t < 0 &&
+        if (strand == UNKNOWN_STRAND && start_t < 0 &&
                 ((vpath[t]>=M1_STATE && vpath[t]<=M6_STATE) ||
                  (vpath[t]>=M1_STATE_1 && vpath[t]<=M6_STATE_1) ||
                  vpath[t] == S_STATE || vpath[t] == S_STATE_1 )) {
             start_t=t+1;
         }
 
-        if (codon_start == 0 &&
+        if (strand == UNKNOWN_STRAND &&
                 (vpath[t]==M1_STATE || vpath[t]==M4_STATE ||
                  vpath[t]==M1_STATE_1 || vpath[t]==M4_STATE_1)) {
 
@@ -785,12 +785,12 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             prev_match = vpath[t];
 
             if (vpath[t] < M6_STATE) {
-                codon_start = 1;
+                strand = FORWARD_STRAND;
             } else {
-                codon_start = -1;
+                strand = REVERSE_STRAND;
             }
 
-        } else if (codon_start != 0 && (vpath[t] == E_STATE || vpath[t] == E_STATE_1 || t == len_seq-1)) {
+        } else if (strand != UNKNOWN_STRAND && (vpath[t] == E_STATE || vpath[t] == E_STATE_1 || t == len_seq-1)) {
 
             if (vpath[t] == E_STATE || vpath[t] == E_STATE_1) {
                 end_t = t+3;
@@ -820,18 +820,18 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             //!! Transfer all of the output buffer writing code to another function. Modularize this.
 
             if (dna_id > gene_len) {
-                print_outputs(codon_start, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
+                print_outputs(strand, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
                               dna, dna_id + 1, sequence, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
                 multiple++;
             }
 
-            codon_start = 0;
+            strand = UNKNOWN_STRAND;
             start_t = -1;
             end_t = -1;
             dna_id = 0;
             dna_f_id = 0;
 
-        } else if (codon_start != 0 &&
+        } else if (strand != UNKNOWN_STRAND &&
                    ((vpath[t] >= M1_STATE && vpath[t] <= M6_STATE) ||
                     (vpath[t] >= M1_STATE_1 && vpath[t] <= M6_STATE_1)) &&
                    vpath[t] - prev_match < 6) {
@@ -855,7 +855,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             dna_f[dna_f_id] = O[t];
             prev_match = vpath[t];
 
-        } else if (codon_start != 0 &&
+        } else if (strand != UNKNOWN_STRAND &&
                    ((vpath[t] >= I1_STATE && vpath[t] <= I6_STATE) ||
                     (vpath[t] >= I1_STATE_1 && vpath[t] <= I6_STATE_1))) {
             dna_f_id ++;
@@ -863,9 +863,9 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             insert[insert_id] = t+1;
             insert_id++;
 
-        } else if (codon_start != 0 && vpath[t] == R_STATE) {
+        } else if (strand != UNKNOWN_STRAND && vpath[t] == R_STATE) {
             /* for long NNNNNNNNN, pretend R state */
-            codon_start = 0;
+            strand = UNKNOWN_STRAND;
             start_t = -1;
             end_t = -1;
             dna_id = 0;
@@ -1105,13 +1105,13 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
 
 }
 
-void print_outputs(int codon_start, int start_t, int end_t, int frame, char *output_buffer, char *aa_buffer, char *dna_buffer,
+void print_outputs(Strand strand, int start_t, int end_t, int frame, char *output_buffer, char *aa_buffer, char *dna_buffer,
                    char *sequence_head_short, char *dna, int dna_len, Nucleotide dna_seq[], char *rc_dna, char *dna_f, char *rc_dna_f, char *protein,
                    int *insertions, int *deletions, int insertions_len, int deletions_len, bool format, char *temp_str_ptr, unsigned int multiple) {
     int i;
-    char strand_sign = (codon_start == 1)? '+' : '-';
+    char strand_sign = (strand == FORWARD_STRAND)? '+' : '-';
 
-    if (codon_start != 1 && codon_start != -1)
+    if (strand == UNKNOWN_STRAND)
         return;
 
     /* Print the insertions and deletions to the output buffer */
@@ -1134,7 +1134,7 @@ void print_outputs(int codon_start, int start_t, int end_t, int frame, char *out
         strcat(aa_buffer, "\t");
     sprintf(temp_str_ptr, "%s_%d_%d_%c\n", sequence_head_short, start_t, end_t, strand_sign);
     strcat(aa_buffer, temp_str_ptr);
-    get_protein(dna_seq, dna_len, protein, codon_start);
+    get_protein(dna_seq, dna_len, protein, strand);
     sprintf(temp_str_ptr, "%s\n", protein);
     strcat(aa_buffer, temp_str_ptr);
 
@@ -1142,7 +1142,7 @@ void print_outputs(int codon_start, int start_t, int end_t, int frame, char *out
     sprintf(temp_str_ptr, "%s_%d_%d_%c\n", sequence_head_short, start_t, end_t, strand_sign);
     strcat(dna_buffer, temp_str_ptr);
     /* Don't forget to print the reverse complement if in opposite strand */
-    if (codon_start == 1) {
+    if (strand == FORWARD_STRAND) {
         sprintf(temp_str_ptr, "%s\n", (format)? dna_f : dna);
     } else {
         get_rc_dna(dna, dna_len, rc_dna);

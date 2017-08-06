@@ -307,13 +307,13 @@ void get_rc_dna_indel(char *dna, int dna_len, char *dna1) {
 }
 
 
-void get_protein(Nucleotide dna[], int dna_len, char *protein, int strand) {
+void get_protein(Nucleotide dna[], int dna_len, char *protein, Strand strand) {
     int i;
 
     /* If our DNA sequence is not a multiple of 3, throw away the last nucleotides */
     dna_len -= dna_len % 3;
 
-    if (strand ==1) {
+    if (strand == FORWARD_STRAND) {
         for (i = 0; i < dna_len; i += 3)
             protein[i/3] = (*translation_table)[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
     } else {

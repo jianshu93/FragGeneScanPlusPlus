@@ -51,6 +51,13 @@ typedef enum {
     NUCL_INVALID
 } Nucleotide;
 
+/** A DNA strand */
+typedef enum {
+    FORWARD_STRAND = 1,
+    REVERSE_STRAND = -1,
+    UNKNOWN_STRAND = 0
+} Strand;
+
 /** The amount of possible states */
 #define NUM_STATE 29
 

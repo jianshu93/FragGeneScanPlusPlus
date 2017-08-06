@@ -42,7 +42,7 @@ int trinucleotide (Nucleotide a, Nucleotide b, Nucleotide c);
  * @param[out] protein The output buffer for the protein.
  * @param strand What strand to translate.
  */
-void get_protein(Nucleotide dna[], int dna_len, char *protein, int strand);
+void get_protein(Nucleotide dna[], int dna_len, char *protein, Strand strand);
 void print_usage();
 
 typedef struct q {
