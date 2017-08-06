@@ -1142,7 +1142,7 @@ void print_outputs(Strand strand, int start_t, int end_t, int frame, char *outpu
     if (strand == FORWARD_STRAND) {
         sprintf(temp_str_ptr, "%s\n", (format)? dna_f : dna);
     } else {
-        get_rc_dna(dna, dna_len, rc_dna);
+        get_rc_dna(dna_seq, dna_len, rc_dna);
         get_rc_dna_indel(dna_f, dna_len, rc_dna_f);
         sprintf(temp_str_ptr, "%s\n", (format)? rc_dna_f : rc_dna);
     }

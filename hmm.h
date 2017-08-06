@@ -271,10 +271,10 @@ void free_hmm(HMM *hmm);
 /**
  * Calculates the reverse-complement of given DNA
  *
- * @param dna The string we want to take the reverse-complement of.
+ * @param dna The DNA we want to take the reverse-complement of.
  * @param[out] rc_dna The output buffer for the reverse-complement.
  */
-void get_rc_dna(char *dna, int dna_len, char *rc_dna);
+void get_rc_dna(Nucleotide dna[], int dna_len, char *rc_dna);
 
 void get_rc_dna_indel(char* dna_f, int dna_len, char* dna_f1);
 void get_corrected_dna(char *dna, char *dna_f);

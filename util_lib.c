@@ -229,29 +229,12 @@ static int trinucleotide_pep (Nucleotide a, Nucleotide b, Nucleotide c) {
 }
 
 // Calculates the reverse complement of the bases in `dna` and saves it in `reverse_complement`
-void get_rc_dna(char *dna, int dna_len, char *reverse_complement) {
+void get_rc_dna(Nucleotide dna[], int dna_len, char *reverse_complement) {
+    static char NUCL_CHARACTERS_RC[] = "TGCAN";
     int i;
 
-    for (i = 0; i < dna_len; i++) {
-        char rc;
-        switch (dna[i]) {
-            case 'A':
-            case 'a':
-                rc = 'T';
-            case 'C':
-            case 'c':
-                rc = 'G';
-            case 'G':
-            case 'g':
-                rc = 'C';
-            case 'T':
-            case 't':
-                rc = 'A';
-            default:
-                rc = 'N';
-        }
-        reverse_complement[dna_len-i-1] = rc;
-    }
+    for (i = 0; i < dna_len; i++)
+        reverse_complement[dna_len-i-1] = NUCL_CHARACTERS_RC[dna[i]];
 }
 
 void get_rc_dna_indel(char *dna, int dna_len, char *dna1) {
