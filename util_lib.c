@@ -81,14 +81,11 @@ void cutnpaste_q(QUEUE **dest, unsigned int which) {
     *head = 0;
 }
 
+/* This is the viterbi score matrix for this sequence. */
 double **dmatrix(int num_col) {
+    int i;
+    double **m = calloc(NUM_STATE, sizeof(double *));
 
-    // NUM_STATE = NUM_STATE. This is the viterbi score matrix for this sequence.
-
-    int i, j;
-    double **m;
-
-    m = calloc(NUM_STATE, sizeof(double *));
     if (!m) {
         fprintf(stderr, "%s\n", "ERROR: Allocation failure for points to rows in dmatrix()");
         exit(EXIT_FAILURE);
@@ -105,20 +102,17 @@ double **dmatrix(int num_col) {
 }
 
 
+/* NUM_STATE = NUM_STATE. This is the viterbi score matrix for this sequence. */
 int **imatrix(int num_col) {
+    int i;
+    int **m = calloc(NUM_STATE, sizeof(int *));
 
-    // NUM_STATE = NUM_STATE. This is the viterbi score matrix for this sequence.
-
-    int i, j;
-    int **m;
-
-    m = calloc(NUM_STATE, sizeof(int *));
     if (!m) {
         fprintf(stderr, "%s\n", "ERROR: Allocation failure for points to rows in imatrix()");
         exit(EXIT_FAILURE);
     }
 
-    for (i=0; i < NUM_STATE; i++) {
+    for (i = 0; i < NUM_STATE; i++) {
         m[i] = calloc(num_col, sizeof(int));
         if (!m[i]) {
             fprintf(stderr, "%s %d %s\n", "ERROR: Allocation failure for the row ", i ," in imatrix()");
@@ -129,46 +123,37 @@ int **imatrix(int num_col) {
 }
 
 int *ivector(int nh) {
-
-    int j;
-    int *v;
-
-    v = calloc(nh, sizeof(int));
+    int *v = calloc(nh, sizeof(int));
 
     if (!v) {
         fprintf(stderr, "%s\n", "ERROR: Allocation failure in ivector()");
         exit(EXIT_FAILURE);
     }
 
-    for (j=0; j<nh; j++) {
-        v[j] = 0;
-    }
     return v;
 }
 
 void free_dmatrix(double **m) {
-
     int i;
 
     for (i=NUM_STATE-1; i>=0; i--) {
         free(m[i]);
-        m[i] = 0;
+        m[i] = NULL;
     }
     free(m);
-    m = 0;
+    m = NULL;
 }
 
 
 void free_imatrix(int **m) {
-
     int i;
 
     for (i=NUM_STATE-1; i>=0; i--) {
         free(m[i]);
-        m[i] = 0;
+        m[i] = NULL;
     }
     free(m);
-    m = 0;
+    m = NULL;
 }
 
 

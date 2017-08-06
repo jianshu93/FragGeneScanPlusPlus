@@ -16,7 +16,6 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     double h_kd, r_kd, p_kd;
     double temp_alpha, prob;
     double start_freq;
-    double final_score;
 
     Strand strand = UNKNOWN_STRAND;
     int dna_id = 0;
@@ -27,7 +26,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     int prev_match;
     int start_orf;
     int frame;
-    int insert_id, delete_id;
+    int insert_id = 0, delete_id = 0;
     int temp_i[6]   = {0,0,0,0,0,0};
     int temp_i_1[6] = {1,1,1,1,1,1};
     int num_N = 0;
@@ -811,7 +810,6 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 }
                 /* FGS1.12 end: remove incomplete codon */
             }
-            final_score = (alpha[vpath[end_t-4]][end_t-4] - alpha[vpath[start_t+2]][start_t+2] )/(end_t-start_t-5);
             frame = start_orf%3;
             if (frame==0) {
                 frame=3;
@@ -873,11 +871,12 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
         }
     }
+
     free_dmatrix(alpha);
     free_imatrix(path);
     free(vpath);
+    vpath = NULL;
 
-    vpath = 0;
     dna = 0;
     dna1 = 0;
     dna_f = 0;
@@ -886,10 +885,8 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 }
 
 void get_prob_from_cg(HMM *hmm_ptr, TRAIN *train_ptr, char *O, int len_seq) {
-
-    int cg_id = -1;
-    int cg_count=0;
-    int i,j,k;
+    int cg_count = 0;
+    int i;
 
     for (i = 0; i < len_seq; i++) {
         if ((O[i] == 'C'||O[i] =='c') || (O[i] == 'G'||O[i] == 'g') ) {
