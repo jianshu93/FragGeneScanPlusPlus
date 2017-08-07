@@ -250,6 +250,9 @@ void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand stra
         for (i = 0; i < dna_len; i += 3)
             protein[(dna_len-i)/3-1] = translation_table_rc[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
     }
+
+    /* Don't forget the string terminator */
+    protein[(dna_len/3)] = '\0';
 }
 
 void print_usage() {
