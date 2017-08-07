@@ -79,7 +79,7 @@ void printq(unsigned int which);
 /**
  * Enqueues the given worker thread's buffer to the given queue
  */
-void enq(ThreadData *td, unsigned int buffer, unsigned int which);
+void enqueue(ThreadData *td, unsigned int buffer, unsigned int which);
 
 /**
  * Dequeues the first element of the given queue.
