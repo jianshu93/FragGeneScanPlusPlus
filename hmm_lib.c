@@ -18,6 +18,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     double start_freq;
 
     Strand strand = UNKNOWN_STRAND;
+    Nucleotide dna_seq[len_seq];
     int dna_id = 0;
     int dna_f_id = 0;
     int out_nt;
@@ -779,6 +780,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             dna_id = 0;
             dna_f_id = 0;
             dna[dna_id] = O[t];
+            dna_seq[dna_id] = sequence[t];
             dna_f[dna_f_id] = O[t];
             start_orf = t+1;
             prev_match = vpath[t];
@@ -819,7 +821,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
 
             if (dna_id > gene_len) {
                 print_outputs(strand, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
-                              dna, dna_id + 1, sequence, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
+                              dna, dna_id + 1, dna_seq, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
                 multiple++;
             }
 
@@ -842,6 +844,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             for (kk = 0; kk < out_nt; kk++) {  /* for deleted nt in reads */
                 dna_id ++;
                 dna[dna_id] = 'N';
+                dna_seq[dna_id] = NUCL_INVALID;
                 dna_f_id++;
                 dna_f[dna_f_id] = 'x';
                 if (kk>0) {
@@ -850,6 +853,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
                 }
             }
             dna[dna_id] = O[t];
+            dna_seq[dna_id] = sequence[t];
             dna_f[dna_f_id] = O[t];
             prev_match = vpath[t];
 
