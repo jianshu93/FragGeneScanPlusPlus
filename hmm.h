@@ -216,8 +216,6 @@ typedef struct {
 
     /** Whether the input sequence(s) are whole genomes or only reads. */
     bool wholegenome;
-    /** Whether to write out formatted output */
-    bool format;
 
     unsigned int *output_num_sequences;
     unsigned int *input_num_sequences;
@@ -244,8 +242,6 @@ typedef struct {
     /* Temporary buffers */
     char* dna;
     char* dna1;
-    char* dna_f;
-    char* dna_f1;
     char* protein;
     char* temp_str;
 
@@ -293,20 +289,17 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mf
  * @param dna_buffer A pre-allocated buffer to store the FASTA of the predicted genes.
  * @param sequence_head The header of the input sequence
  * @param whole_genome Whether the input sequence is the whole genomic sequence.
- * @param format Whether to use formatted output.
  * @param seq_len The length of the input sequence.
  * @param dna_ptr A pre-allocated buffer to contain the gene's dna.
  * @param dna1_ptr A pre-allocated buffer to contain the gene's dna's reverse complement.
- * @param dna_f_ptr A pre-allocated buffer to contain the gene's formatted dna.
- * @param dna_f1_ptr A pre-allocated buffer to contain the gene's formatted dna's reverse complement.
  * @param protein_ptr A pre-allocated buffer to contain the translated protein sequence.
  * @param insertions An allocated list to store the positions of the insertions.
  * @param deletions An allocated list to store the positions of the deletions.
  * @param temp_str_ptr A pre-allocated general-purpose buffer.
  */
 void viterbi(HMM *hmm_ptr, const char *input_seq, char* output_buffer, char* aa_buffer, char *dna_buffer,
-             char *sequence_head, bool whole_genome, bool format, int seq_len,
-             char *dna_ptr, char *dna1_ptr, char *dna_f_ptr, char *dna_f1_ptr, char *protein_ptr,
+             char *sequence_head, bool whole_genome, int seq_len,
+             char *dna_ptr, char *dna1_ptr, char *protein_ptr,
              int *insertions, int *deletions, char *temp_str_ptr);
 
 /**
@@ -323,7 +316,6 @@ void free_hmm(HMM *hmm);
  */
 void get_rc_dna(const Nucleotide dna[], int dna_len, char *rc_dna);
 
-void get_rc_dna_indel(const char* dna_f, int dna_len, char* dna_f1);
 void print_usage();
 
 /**
@@ -340,7 +332,6 @@ void print_usage();
  * @param dna The complete DNA input string.
  * @param dna_seq The complete DNA nucleotide sequence.
  * @param dna_len The length of `dna`and `dna_seq`.
- * @param dna_f The (supposedly?) formatted nucleotide sequence of the gene (on the sense strand).
  * @param insertions The list of the insertions
  * @param insertions_len The length of `insertions`
  * @param deletions The list of the deletions
@@ -356,13 +347,11 @@ void print_usage();
  * Other output information
  * -------------------------
  * @param sequence_head_short The sequence header for the FASTA files (without '>').
- * @param format Whether to use a formatted sequence (see `dna_f` and `rc_dna_f`)
  * @param multiple (> 0) if multiple genes were found
  *
  * Temporary output buffers (already allocated)
  * ------------------------
  * @param rc_dna buffer which you can fill with the reverse complement of the dna.
- * @param rc_dna_f buffer which you can fill with the formatted(?) reverse complement of the dna.
  * @param protein buffer which you can fill with the translated gene.
  * @param temp_str_ptr General-purpose string buffer
  */
@@ -370,9 +359,9 @@ void print_gene(int codon_start, int start_t, int end_t, int frame,
                 char *output_buffer, char *aa_buffer, char *dna_buffer,
                 const char *sequence_head_short,
                 const char *dna, int dna_len, const Nucleotide dna_seq[],
-                char *rc_dna, char* dna_f, char *rc_dna_f, char *protein,
+                char *rc_dna, char *protein,
                 const int *insertions, const int *deletions, int insertions_len, int deletions_len,
-                bool format, char *temp_str_ptr, unsigned int multiple);
+                char *temp_str_ptr, unsigned int multiple);
 
 // helper functions to cleanup the main function
 void setTrainDirectory(char* train_path);

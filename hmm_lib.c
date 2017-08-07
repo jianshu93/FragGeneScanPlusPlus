@@ -1,8 +1,8 @@
 #include "util_lib.h"
 
 void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
-             char *dna_buffer, char *sequence_head, bool whole_genome, bool format,
-             int len_seq, char *dna, char *dna1, char *dna_f, char *dna_f1,
+             char *dna_buffer, char *sequence_head, bool whole_genome,
+             int len_seq, char *dna, char *dna1,
              char *protein, int *insert, int *c_delete, char *temp_str_ptr) {
 
     int *vpath;                          // optimal path after backtracking
@@ -20,7 +20,6 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
     Strand strand = UNKNOWN_STRAND;
     Nucleotide dna_seq[len_seq];
     int dna_id = 0;
-    int dna_f_id = 0;
     int out_nt;
     int start_t = -1;
     int end_t;
@@ -769,8 +768,6 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
 
             stopMemset(dna, STRINGLEN);
             stopMemset(dna1, STRINGLEN);//
-            stopMemset(dna_f, STRINGLEN);//
-            stopMemset(dna_f1, STRINGLEN);//
             stopMemset(protein, STRINGLEN);
             stopMemset(insert, STRINGLEN);//
             stopMemset(c_delete, STRINGLEN);//
@@ -778,10 +775,8 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
             insert_id = 0;
             delete_id = 0;
             dna_id = 0;
-            dna_f_id = 0;
             dna[dna_id] = O[t];
             dna_seq[dna_id] = sequence[t];
-            dna_f[dna_f_id] = O[t];
             start_orf = t+1;
             prev_match = vpath[t];
 
@@ -802,9 +797,6 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
                 int temp_t = t;
                 while (vpath[temp_t] != M1_STATE && vpath[temp_t] != M4_STATE  &&
                         vpath[temp_t] != M1_STATE_1  && vpath[temp_t] != M4_STATE_1) {
-                    dna_f[dna_f_id] = '\0';
-                    dna_f_id--;
-
                     dna[dna_id] = '\0';
                     dna_id--;
 
@@ -821,7 +813,7 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
 
             if (dna_id > gene_len) {
                 print_gene(strand, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
-                              dna, dna_id + 1, dna_seq, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
+                              dna, dna_id + 1, dna_seq, dna1, protein, insert, c_delete, insert_id, delete_id, temp_str_ptr,multiple);
                 multiple++;
             }
 
@@ -829,7 +821,6 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
             start_t = -1;
             end_t = -1;
             dna_id = 0;
-            dna_f_id = 0;
 
         } else if (strand != UNKNOWN_STRAND &&
                    ((vpath[t] >= M1_STATE && vpath[t] <= M6_STATE) ||
@@ -845,8 +836,6 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
                 dna_id ++;
                 dna[dna_id] = 'N';
                 dna_seq[dna_id] = NUCL_INVALID;
-                dna_f_id++;
-                dna_f[dna_f_id] = 'x';
                 if (kk>0) {
                     c_delete[delete_id] = t+1;
                     delete_id++;
@@ -854,14 +843,11 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
             }
             dna[dna_id] = O[t];
             dna_seq[dna_id] = sequence[t];
-            dna_f[dna_f_id] = O[t];
             prev_match = vpath[t];
 
         } else if (strand != UNKNOWN_STRAND &&
                    ((vpath[t] >= I1_STATE && vpath[t] <= I6_STATE) ||
                     (vpath[t] >= I1_STATE_1 && vpath[t] <= I6_STATE_1))) {
-            dna_f_id ++;
-            dna_f[dna_f_id] = tolower(sequence[t]);
             insert[insert_id] = t+1;
             insert_id++;
 
@@ -871,7 +857,6 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
             start_t = -1;
             end_t = -1;
             dna_id = 0;
-            dna_f_id = 0;
 
         }
     }
@@ -883,8 +868,6 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
 
     dna = 0;
     dna1 = 0;
-    dna_f = 0;
-    dna_f = 0;
     protein = 0;
 }
 
@@ -1107,8 +1090,8 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
 }
 
 void print_gene(Strand strand, int start_t, int end_t, int frame, char *output_buffer, char *aa_buffer, char *dna_buffer,
-                const char *sequence_head_short, const char *dna, int dna_len, const Nucleotide dna_seq[], char *rc_dna, char *dna_f, char *rc_dna_f, char *protein,
-                const int *insertions, const int *deletions, int insertions_len, int deletions_len, bool format, char *temp_str_ptr, unsigned int multiple) {
+                const char *sequence_head_short, const char *dna, int dna_len, const Nucleotide dna_seq[], char *rc_dna, char *protein,
+                const int *insertions, const int *deletions, int insertions_len, int deletions_len, char *temp_str_ptr, unsigned int multiple) {
     int i;
     char strand_sign = (strand == FORWARD_STRAND)? '+' : '-';
 
@@ -1144,11 +1127,10 @@ void print_gene(Strand strand, int start_t, int end_t, int frame, char *output_b
     strcat(dna_buffer, temp_str_ptr);
     /* Don't forget to print the reverse complement if in opposite strand */
     if (strand == FORWARD_STRAND) {
-        sprintf(temp_str_ptr, "%s\n", (format)? dna_f : dna);
+        sprintf(temp_str_ptr, "%s\n", dna);
     } else {
         get_rc_dna(dna_seq, dna_len, rc_dna);
-        get_rc_dna_indel(dna_f, dna_len, rc_dna_f);
-        sprintf(temp_str_ptr, "%s\n", (format)? rc_dna_f : rc_dna);
+        sprintf(temp_str_ptr, "%s\n", rc_dna);
     }
     strcat(dna_buffer, temp_str_ptr);
 }

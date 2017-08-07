@@ -237,40 +237,6 @@ void get_rc_dna(const Nucleotide dna[], int dna_len, char *reverse_complement) {
         reverse_complement[dna_len-i-1] = NUCL_CHARACTERS_RC[dna[i]];
 }
 
-void get_rc_dna_indel(const char *dna_f, int dna_len, char *dna1) {
-    int i;
-
-    for (i = 0; i < dna_len; i++) {
-        char rc;
-        switch (dna_f[i]) {
-            case 'A':
-                rc = 'T';
-            case 'a':
-                rc = 't';
-            case 'C':
-                rc = 'G';
-            case 'c':
-                rc = 'g';
-            case 'G':
-                rc = 'C';
-            case 'g':
-                rc = 'c';
-            case 'T':
-                rc = 'A';
-            case 't':
-                rc = 'a';
-            case 'n':
-                rc = 'n';
-            case 'x':
-                rc = 'x';
-            default:
-                rc = 'N';
-        }
-        dna1[dna_len-i-1] = rc;
-    }
-}
-
-
 void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand strand) {
     int i;
 
@@ -285,7 +251,6 @@ void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand stra
             protein[(dna_len-i)/3-1] = (*translation_table_rc)[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
     }
 }
-
 
 void print_usage() {
 

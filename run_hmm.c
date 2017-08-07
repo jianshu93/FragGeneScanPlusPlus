@@ -4,7 +4,6 @@
 #include "util_lib.h"
 
 /* User-specified options */
-bool format = false;
 bool wholegenome = false;
 bool output_dna = false;
 bool output_meta = false;
@@ -70,11 +69,8 @@ void parseArguments(int argc, char **argv) {
     int c;
     int translation_table_id = 11;
 
-    while ((c = getopt(argc, argv, "fdem:o:p:r:s:t:vw:x:")) != -1) {
+    while ((c = getopt(argc, argv, "dem:o:p:r:s:t:vw:x:")) != -1) {
         switch (c) {
-        case 'f':
-            format = true;
-            break;
         case 'd':
             output_dna = true;
             break;
@@ -461,8 +457,6 @@ void thread_data_init(ThreadData *td, unsigned int id) {
 
     td->dna = calloc(STRINGLEN, sizeof(char));
     td->dna1 = calloc(STRINGLEN, sizeof(char));
-    td->dna_f = calloc(STRINGLEN, sizeof(char));
-    td->dna_f1 = calloc(STRINGLEN, sizeof(char));
     td->protein = calloc(STRINGLEN, sizeof(char));
     td->temp_str = calloc(STRINGLEN, sizeof(char));
 
@@ -606,9 +600,8 @@ void runViterbiOnBuffers(ThreadData *td, unsigned int b) {
 
             viterbi(td->hmm, td->record_sequences[b][i], td->output_buffer[b][i],
                     td->aa_buffer[b][i], td->dna_buffer[b][i],
-                    td->record_headers[b][i], td->wholegenome, td->format, td->record_sequences_lens[b][i],
-                    td->dna, td->dna1, td->dna_f, td->dna_f1, td->protein,
-                    td->insert, td->c_delete, td->temp_str);
+                    td->record_headers[b][i], td->wholegenome, td->record_sequences_lens[b][i],
+                    td->dna, td->dna1, td->protein, td->insert, td->c_delete, td->temp_str);
         }
     }
 
