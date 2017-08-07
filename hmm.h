@@ -275,7 +275,7 @@ void thread_data_init(ThreadData *td, unsigned int id);
  */
 int read_seq_into_buffer(FastaFile *fp, ThreadData *td, unsigned int buf, bool initial_input);
 
-void get_prob_from_cg(HMM *hmm, TRAIN *train, char *O, int len_seq);
+void get_prob_from_cg(HMM *hmm, TRAIN *train, const char *O, int len_seq);
 
 /**
  * Load the training data for the given HMM.
@@ -304,10 +304,10 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mf
  * @param deletions An allocated list to store the positions of the deletions.
  * @param temp_str_ptr A pre-allocated general-purpose buffer.
  */
-void viterbi(HMM *hmm_ptr, char *input_seq, char* output_buffer, char* aa_buffer, char *dna_buffer,
+void viterbi(HMM *hmm_ptr, const char *input_seq, char* output_buffer, char* aa_buffer, char *dna_buffer,
              char *sequence_head, bool whole_genome, bool format, int seq_len,
-             char* dna_ptr, char* dna1_ptr, char* dna_f_ptr, char* dna_f1_ptr, char* protein_ptr,
-             int* insertions, int* deletions, char* temp_str_ptr);
+             char *dna_ptr, char *dna1_ptr, char *dna_f_ptr, char *dna_f1_ptr, char *protein_ptr,
+             int *insertions, int *deletions, char *temp_str_ptr);
 
 /**
  * Frees any resources used by the given HMM.
@@ -321,9 +321,9 @@ void free_hmm(HMM *hmm);
  * @param dna_len The length of the DNA sequence.
  * @param[out] rc_dna The output buffer for the reverse-complement.
  */
-void get_rc_dna(Nucleotide dna[], int dna_len, char *rc_dna);
+void get_rc_dna(const Nucleotide dna[], int dna_len, char *rc_dna);
 
-void get_rc_dna_indel(char* dna_f, int dna_len, char* dna_f1);
+void get_rc_dna_indel(const char* dna_f, int dna_len, char* dna_f1);
 void print_usage();
 
 /**
@@ -368,9 +368,10 @@ void print_usage();
  */
 void print_gene(int codon_start, int start_t, int end_t, int frame,
                 char *output_buffer, char *aa_buffer, char *dna_buffer,
-                char *sequence_head_short,
-                char *dna, int dna_len, Nucleotide dna_seq[], char *rc_dna, char* dna_f, char *rc_dna_f, char *protein,
-                int *insertions, int *deletions, int insertions_len, int deletions_len,
+                const char *sequence_head_short,
+                const char *dna, int dna_len, const Nucleotide dna_seq[],
+                char *rc_dna, char* dna_f, char *rc_dna_f, char *protein,
+                const int *insertions, const int *deletions, int insertions_len, int deletions_len,
                 bool format, char *temp_str_ptr, unsigned int multiple);
 
 // helper functions to cleanup the main function

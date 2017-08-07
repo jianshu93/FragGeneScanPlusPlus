@@ -20,7 +20,7 @@ void free_imatrix(int **m);
 /**
  * Parses the given string into a HMM_StateTransition.
  */
-HMM_StateTransition hmm_state_transition_parse (char *nt);
+HMM_StateTransition hmm_state_transition_parse (const char *nt);
 
 /**
  * Parses the given character as a nucleotide.
@@ -45,7 +45,7 @@ int trinucleotide (Nucleotide a, Nucleotide b, Nucleotide c);
  * @param[out] protein The output buffer for the protein.
  * @param strand What strand to translate.
  */
-void get_protein(Nucleotide dna[], int dna_len, char *protein, Strand strand);
+void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand strand);
 
 /**
  * Print out the usage info for the executable.

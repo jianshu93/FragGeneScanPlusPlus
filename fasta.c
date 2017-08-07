@@ -11,7 +11,7 @@
 
 #include "fasta.h"
 
-FastaFile *fasta_file_new(char *seqfile) {
+FastaFile *fasta_file_new(const char *seqfile) {
 
     FastaFile *ffp;
     ffp = malloc(sizeof(FastaFile));

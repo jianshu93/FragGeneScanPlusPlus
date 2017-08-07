@@ -98,7 +98,7 @@ typedef struct {
  * @param seqfile The path of the FASTA file.
  * @returns a FastaFile pointer, or NULL on failure (e.g. if the file doesn't exist, or isn't readable).
  */
-FastaFile *fasta_file_new(char *seqfile);
+FastaFile *fasta_file_new(const char *seqfile);
 
 /**
  * Reads the next record of the FASTA file into a header and sequence buffer.

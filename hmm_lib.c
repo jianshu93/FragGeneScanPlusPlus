@@ -1,6 +1,6 @@
 #include "util_lib.h"
 
-void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
+void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
              char *dna_buffer, char *sequence_head, bool whole_genome, bool format,
              int len_seq, char *dna, char *dna1, char *dna_f, char *dna_f1,
              char *protein, int *insert, int *c_delete, char *temp_str_ptr) {
@@ -888,7 +888,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
     protein = 0;
 }
 
-void get_prob_from_cg(HMM *hmm_ptr, TRAIN *train_ptr, char *O, int len_seq) {
+void get_prob_from_cg(HMM *hmm_ptr, TRAIN *train_ptr, const char *O, int len_seq) {
     int cg_count = 0;
     int i;
 
@@ -1107,8 +1107,8 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
 }
 
 void print_gene(Strand strand, int start_t, int end_t, int frame, char *output_buffer, char *aa_buffer, char *dna_buffer,
-                   char *sequence_head_short, char *dna, int dna_len, Nucleotide dna_seq[], char *rc_dna, char *dna_f, char *rc_dna_f, char *protein,
-                   int *insertions, int *deletions, int insertions_len, int deletions_len, bool format, char *temp_str_ptr, unsigned int multiple) {
+                const char *sequence_head_short, const char *dna, int dna_len, const Nucleotide dna_seq[], char *rc_dna, char *dna_f, char *rc_dna_f, char *protein,
+                const int *insertions, const int *deletions, int insertions_len, int deletions_len, bool format, char *temp_str_ptr, unsigned int multiple) {
     int i;
     char strand_sign = (strand == FORWARD_STRAND)? '+' : '-';
 

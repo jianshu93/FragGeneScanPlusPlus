@@ -157,7 +157,7 @@ void free_imatrix(int **m) {
 }
 
 
-HMM_StateTransition hmm_state_transition_parse (char *tr) {
+HMM_StateTransition hmm_state_transition_parse (const char *tr) {
     if (strcmp(tr, "MM") == 0)
         return TR_MM;
     if (strcmp(tr, "MI") == 0)
@@ -229,7 +229,7 @@ static int trinucleotide_pep (Nucleotide a, Nucleotide b, Nucleotide c) {
 }
 
 // Calculates the reverse complement of the bases in `dna` and saves it in `reverse_complement`
-void get_rc_dna(Nucleotide dna[], int dna_len, char *reverse_complement) {
+void get_rc_dna(const Nucleotide dna[], int dna_len, char *reverse_complement) {
     static char NUCL_CHARACTERS_RC[] = "TGCAN";
     int i;
 
@@ -237,12 +237,12 @@ void get_rc_dna(Nucleotide dna[], int dna_len, char *reverse_complement) {
         reverse_complement[dna_len-i-1] = NUCL_CHARACTERS_RC[dna[i]];
 }
 
-void get_rc_dna_indel(char *dna, int dna_len, char *dna1) {
+void get_rc_dna_indel(const char *dna_f, int dna_len, char *dna1) {
     int i;
 
     for (i = 0; i < dna_len; i++) {
         char rc;
-        switch (dna[i]) {
+        switch (dna_f[i]) {
             case 'A':
                 rc = 'T';
             case 'a':
@@ -271,7 +271,7 @@ void get_rc_dna_indel(char *dna, int dna_len, char *dna1) {
 }
 
 
-void get_protein(Nucleotide dna[], int dna_len, char *protein, Strand strand) {
+void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand strand) {
     int i;
 
     /* If our DNA sequence is not a multiple of 3, throw away the last nucleotides */
