@@ -6,7 +6,7 @@
 int TRANSLATION_TABLES[20] = { 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 21, 22, 23, 24, 25, 26 };
 #define NUM_TRANSLATION_TABLES 20;
 
-char TRANSLATION_TABLE_1[65] = {
+const char TRANSLATION_TABLE_1[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -26,7 +26,7 @@ char TRANSLATION_TABLE_1[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_1_RC[65] = {
+const char TRANSLATION_TABLE_1_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -46,7 +46,7 @@ char TRANSLATION_TABLE_1_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_2[65] = {
+const char TRANSLATION_TABLE_2[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     '*', 'S', '*', 'S',
@@ -66,7 +66,7 @@ char TRANSLATION_TABLE_2[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_2_RC[65] = {
+const char TRANSLATION_TABLE_2_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -86,7 +86,7 @@ char TRANSLATION_TABLE_2_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_3[65] = {
+const char TRANSLATION_TABLE_3[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -106,7 +106,7 @@ char TRANSLATION_TABLE_3[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_3_RC[65] = {
+const char TRANSLATION_TABLE_3_RC[65] = {
     'F', 'V', 'T', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -126,7 +126,7 @@ char TRANSLATION_TABLE_3_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_4[65] = {
+const char TRANSLATION_TABLE_4[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -146,7 +146,7 @@ char TRANSLATION_TABLE_4[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_4_RC[65] = {
+const char TRANSLATION_TABLE_4_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -166,7 +166,7 @@ char TRANSLATION_TABLE_4_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_5[65] = {
+const char TRANSLATION_TABLE_5[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'S', 'S', 'S', 'S',
@@ -186,7 +186,7 @@ char TRANSLATION_TABLE_5[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_5_RC[65] = {
+const char TRANSLATION_TABLE_5_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -206,7 +206,7 @@ char TRANSLATION_TABLE_5_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_6[65] = {
+const char TRANSLATION_TABLE_6[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -226,7 +226,7 @@ char TRANSLATION_TABLE_6[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_6_RC[65] = {
+const char TRANSLATION_TABLE_6_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -246,7 +246,7 @@ char TRANSLATION_TABLE_6_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_9[65] = {
+const char TRANSLATION_TABLE_9[65] = {
     'N', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'S', 'S', 'S', 'S',
@@ -266,7 +266,7 @@ char TRANSLATION_TABLE_9[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_9_RC[65] = {
+const char TRANSLATION_TABLE_9_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -286,7 +286,7 @@ char TRANSLATION_TABLE_9_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_10[65] = {
+const char TRANSLATION_TABLE_10[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -306,7 +306,7 @@ char TRANSLATION_TABLE_10[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_10_RC[65] = {
+const char TRANSLATION_TABLE_10_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -326,7 +326,7 @@ char TRANSLATION_TABLE_10_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_11[65] = {
+const char TRANSLATION_TABLE_11[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -346,7 +346,7 @@ char TRANSLATION_TABLE_11[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_11_RC[65] = {
+const char TRANSLATION_TABLE_11_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -366,7 +366,7 @@ char TRANSLATION_TABLE_11_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_12[65] = {
+const char TRANSLATION_TABLE_12[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -386,7 +386,7 @@ char TRANSLATION_TABLE_12[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_12_RC[65] = {
+const char TRANSLATION_TABLE_12_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -406,7 +406,7 @@ char TRANSLATION_TABLE_12_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_13[65] = {
+const char TRANSLATION_TABLE_13[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'G', 'S', 'G', 'S',
@@ -426,7 +426,7 @@ char TRANSLATION_TABLE_13[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_13_RC[65] = {
+const char TRANSLATION_TABLE_13_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -446,7 +446,7 @@ char TRANSLATION_TABLE_13_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_14[65] = {
+const char TRANSLATION_TABLE_14[65] = {
     'N', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'S', 'S', 'S', 'S',
@@ -466,7 +466,7 @@ char TRANSLATION_TABLE_14[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_14_RC[65] = {
+const char TRANSLATION_TABLE_14_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -486,7 +486,7 @@ char TRANSLATION_TABLE_14_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_15[65] = {
+const char TRANSLATION_TABLE_15[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -506,7 +506,7 @@ char TRANSLATION_TABLE_15[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_15_RC[65] = {
+const char TRANSLATION_TABLE_15_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -526,7 +526,7 @@ char TRANSLATION_TABLE_15_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_16[65] = {
+const char TRANSLATION_TABLE_16[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -546,7 +546,7 @@ char TRANSLATION_TABLE_16[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_16_RC[65] = {
+const char TRANSLATION_TABLE_16_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -566,7 +566,7 @@ char TRANSLATION_TABLE_16_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_21[65] = {
+const char TRANSLATION_TABLE_21[65] = {
     'N', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'S', 'S', 'S', 'S',
@@ -586,7 +586,7 @@ char TRANSLATION_TABLE_21[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_21_RC[65] = {
+const char TRANSLATION_TABLE_21_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -606,7 +606,7 @@ char TRANSLATION_TABLE_21_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_22[65] = {
+const char TRANSLATION_TABLE_22[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -626,7 +626,7 @@ char TRANSLATION_TABLE_22[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_22_RC[65] = {
+const char TRANSLATION_TABLE_22_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -646,7 +646,7 @@ char TRANSLATION_TABLE_22_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_23[65] = {
+const char TRANSLATION_TABLE_23[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -666,7 +666,7 @@ char TRANSLATION_TABLE_23[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_23_RC[65] = {
+const char TRANSLATION_TABLE_23_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -686,7 +686,7 @@ char TRANSLATION_TABLE_23_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_24[65] = {
+const char TRANSLATION_TABLE_24[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'S', 'S', 'K', 'S',
@@ -706,7 +706,7 @@ char TRANSLATION_TABLE_24[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_24_RC[65] = {
+const char TRANSLATION_TABLE_24_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -726,7 +726,7 @@ char TRANSLATION_TABLE_24_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_25[65] = {
+const char TRANSLATION_TABLE_25[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -746,7 +746,7 @@ char TRANSLATION_TABLE_25[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_25_RC[65] = {
+const char TRANSLATION_TABLE_25_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -766,7 +766,7 @@ char TRANSLATION_TABLE_25_RC[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_26[65] = {
+const char TRANSLATION_TABLE_26[65] = {
     'K', 'N', 'K', 'N',
     'T', 'T', 'T', 'T',
     'R', 'S', 'R', 'S',
@@ -786,7 +786,7 @@ char TRANSLATION_TABLE_26[65] = {
     'X'
 };
 
-char TRANSLATION_TABLE_26_RC[65] = {
+const char TRANSLATION_TABLE_26_RC[65] = {
     'F', 'V', 'L', 'I',
     'C', 'G', 'R', 'S',
     'S', 'A', 'P', 'T',
@@ -806,7 +806,7 @@ char TRANSLATION_TABLE_26_RC[65] = {
     'X'
 };
 
-bool parse_translation_tables(int id, char *out_table[], char *out_table_rc[]) {
+bool parse_translation_tables(int id, const char *out_table[], const char *out_table_rc[]) {
     switch (id) {
         case 1: *out_table = TRANSLATION_TABLE_1;
                  *out_table_rc = TRANSLATION_TABLE_1_RC;
