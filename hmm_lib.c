@@ -2,8 +2,8 @@
 
 void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
              char *dna_buffer, char *sequence_head, bool whole_genome,
-             int len_seq, char *dna, char *dna1,
-             char *protein, int *insert, int *deletions, char *temp_str_ptr) {
+             int len_seq, char *dna, char *dna_rc,
+             char *protein, int *insertions, int *deletions, char *temp_str_ptr) {
 
     int *vpath;                          // optimal path after backtracking
     int **path;                          // viterbi path array
@@ -11,7 +11,6 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
     int i, j, t, kk;
     Nucleotide from, from0, to;   /*from0: i-2 position, from: i-1 position */
     int from2;  /* The dinucleotide combining `from` and `from0` */
-    int gene_len;
     int num_d;          		/* the number of delete */
     double h_kd, r_kd, p_kd;
     double temp_alpha, prob;
@@ -21,12 +20,11 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
     Nucleotide dna_seq[len_seq];
     int dna_id = 0;
     int out_nt;
-    int start_t = -1;
-    int end_t;
+    int start_t = -1, end_t = -1;
     int prev_match = 0;
     int start_orf;
     int frame;
-    int insert_id = 0, delete_id = 0;
+    int nr_insertions = 0, nr_deletions = 0;
     int temp_i[6]   = {0,0,0,0,0,0};
     int temp_i_1[6] = {1,1,1,1,1,1};
     int num_N = 0;
@@ -41,7 +39,7 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
     /* initialize                                                  */
     /***************************************************************/
 
-    gene_len = (whole_genome)? 120 : 60;
+    int gene_len = (whole_genome)? 120 : 60;
 
     alpha = (double **)dmatrix(len_seq);
     path = (int **)imatrix(len_seq);
@@ -767,11 +765,11 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
                  vpath[t]==M1_STATE_1 || vpath[t]==M4_STATE_1)) {
 
             dna[0] = '\0';
-            dna1[0] = '\0';
+            dna_rc[0] = '\0';
             protein[0] = '\0';
 
-            insert_id = 0;
-            delete_id = 0;
+            nr_insertions = 0;
+            nr_deletions = 0;
             dna_id = 0;
             dna[dna_id] = O[t];
             dna_seq[dna_id] = sequence[t];
@@ -811,7 +809,7 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
 
             if (dna_id > gene_len) {
                 print_gene(strand, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
-                           dna, dna_id + 1, dna_seq, dna1, protein, insert, deletions, insert_id, delete_id, temp_str_ptr,multiple);
+                           dna, dna_id + 1, dna_seq, dna_rc, protein, insertions, deletions, nr_insertions, nr_deletions, temp_str_ptr,multiple);
                 multiple++;
             }
 
@@ -825,18 +823,17 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
                     (vpath[t] >= M1_STATE_1 && vpath[t] <= M6_STATE_1)) &&
                    vpath[t] - prev_match < 6) {
 
-            if (vpath[t] < prev_match) {
-                out_nt = vpath[t]+6-prev_match;
-            } else {
-                out_nt = vpath[t]-prev_match;
-            }
+            out_nt = vpath[t]-prev_match;
+            if (vpath[t] < prev_match)
+                out_nt += 6;
+
             for (kk = 0; kk < out_nt; kk++) {  /* for deleted nt in reads */
                 dna_id ++;
                 dna[dna_id] = 'N';
                 dna_seq[dna_id] = NUCL_INVALID;
                 if (kk>0) {
-                    deletions[delete_id] = t+1;
-                    delete_id++;
+                    deletions[nr_deletions] = t+1;
+                    nr_deletions++;
                 }
             }
             dna[dna_id] = O[t];
@@ -846,8 +843,8 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
         } else if (strand != UNKNOWN_STRAND &&
                    ((vpath[t] >= I1_STATE && vpath[t] <= I6_STATE) ||
                     (vpath[t] >= I1_STATE_1 && vpath[t] <= I6_STATE_1))) {
-            insert[insert_id] = t+1;
-            insert_id++;
+            insertions[nr_insertions] = t+1;
+            nr_insertions++;
 
         } else if (strand != UNKNOWN_STRAND && vpath[t] == R_STATE) {
             /* for long NNNNNNNNN, pretend R state */
@@ -865,7 +862,7 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
     vpath = NULL;
 
     dna = 0;
-    dna1 = 0;
+    dna_rc = 0;
     protein = 0;
 }
 
