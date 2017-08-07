@@ -3,7 +3,7 @@
 void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
              char *dna_buffer, char *sequence_head, bool whole_genome,
              int len_seq, char *dna, char *dna1,
-             char *protein, int *insert, int *c_delete, char *temp_str_ptr) {
+             char *protein, int *insert, int *deletions, char *temp_str_ptr) {
 
     int *vpath;                          // optimal path after backtracking
     int **path;                          // viterbi path array
@@ -23,7 +23,7 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
     int out_nt;
     int start_t = -1;
     int end_t;
-    int prev_match;
+    int prev_match = 0;
     int start_orf;
     int frame;
     int insert_id = 0, delete_id = 0;
@@ -766,11 +766,9 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
                 (vpath[t]==M1_STATE || vpath[t]==M4_STATE ||
                  vpath[t]==M1_STATE_1 || vpath[t]==M4_STATE_1)) {
 
-            stopMemset(dna, STRINGLEN);
-            stopMemset(dna1, STRINGLEN);//
-            stopMemset(protein, STRINGLEN);
-            stopMemset(insert, STRINGLEN);//
-            stopMemset(c_delete, STRINGLEN);//
+            dna[0] = '\0';
+            dna1[0] = '\0';
+            protein[0] = '\0';
 
             insert_id = 0;
             delete_id = 0;
@@ -813,7 +811,7 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
 
             if (dna_id > gene_len) {
                 print_gene(strand, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
-                              dna, dna_id + 1, dna_seq, dna1, protein, insert, c_delete, insert_id, delete_id, temp_str_ptr,multiple);
+                           dna, dna_id + 1, dna_seq, dna1, protein, insert, deletions, insert_id, delete_id, temp_str_ptr,multiple);
                 multiple++;
             }
 
@@ -837,7 +835,7 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
                 dna[dna_id] = 'N';
                 dna_seq[dna_id] = NUCL_INVALID;
                 if (kk>0) {
-                    c_delete[delete_id] = t+1;
+                    deletions[delete_id] = t+1;
                     delete_id++;
                 }
             }
