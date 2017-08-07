@@ -123,7 +123,9 @@ typedef enum {
     TR_ES1,
 } HMM_StateTransition;
 
+/** The translation table to use for codon translation */
 char *translation_table[65];
+/** The translation table to use for anti-codon translation */
 char *translation_table_rc[65];
 
 // semaphores
@@ -149,6 +151,9 @@ SEM_T sema_r;
 SEM_T sema_w;
 
 
+/**
+ * The Hidden Markov Model (HMM) used to predict sequencing errors.
+ */
 typedef struct {
 
     /**
@@ -248,6 +253,7 @@ typedef struct {
 
 ThreadData *thread_datas;
 
+/** The Hidden Markov model that is used by all threads */
 HMM hmm;
 TRAIN train;
 
