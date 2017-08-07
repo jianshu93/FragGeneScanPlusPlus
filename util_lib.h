@@ -17,6 +17,9 @@ int *ivector(int nh);
 void free_dmatrix(double **m);
 void free_imatrix(int **m);
 
+/**
+ * Parses the given string into a HMM_StateTransition.
+ */
 HMM_StateTransition hmm_state_transition_parse (char *nt);
 
 /**
@@ -43,26 +46,54 @@ int trinucleotide (Nucleotide a, Nucleotide b, Nucleotide c);
  * @param strand What strand to translate.
  */
 void get_protein(Nucleotide dna[], int dna_len, char *protein, Strand strand);
+
+/**
+ * Print out the usage info for the executable.
+ */
 void print_usage();
 
-typedef struct q {
-    struct q *next;
+/**
+ * A queue for worker thread buffers.
+ */
+typedef struct BufferQueue {
+    /** The next thread in the queue */
+    struct BufferQueue *next;
+    /** The worker thread */
     ThreadData *td;
+    /** The specific buffer */
     unsigned int buffer;
 } QUEUE;
 
+/** The queue of empty buffers, waiting for input by the reader thread. */
 QUEUE *q_empty_head;
 QUEUE *q_empty_tail;
+/** The queue of finished buffers, waiting for the writer thread to handle output. */
 QUEUE *q_done_head;
 QUEUE *q_done_tail;
 
-
+/**
+ * Prints out the contents of the given buffer.
+ */
 void printq(unsigned int which);
+
+/**
+ * Enqueues the given worker thread's buffer to the given queue
+ */
 void enq(ThreadData *td, unsigned int buffer, unsigned int which);
+
+/**
+ * Dequeues the first element of the given queue.
+ */
 QUEUE *deq(unsigned int which);
 
+/**
+ * Loads the requested queue into the first arguments' address.
+ */
 void cutnpaste_q(QUEUE **dest, unsigned int which);
 
+/**
+ * A lazy version of memset().
+ */
 void stopMemset(char *ptr, int length);
 
 #endif

@@ -101,17 +101,16 @@ typedef struct {
 FastaFile *fasta_file_new(char *seqfile);
 
 /**
- * @brief Reads the next record from the FASTA file.
+ * Reads the next record of the FASTA file into a header and sequence buffer.
  *
- * Reads a record FASTA file into a header buffer and sequence buffer.
- *
+ * @param fp The FASTA file to read from.
  * @param[out] out_seq An unallocated buffer to contain the sequence. Freed by the caller.
  * @param[out] out_header An unallocated buffer to contain the header. Freed by the caller.
  * @param[out] out_seq_len Will be filled with the length of the sequence.
  *
  * @returns true if more sequences can be read in the file, false otherwise.
  */
-bool fasta_file_read_record(FastaFile *fp, char **out_seq, char **out_name, int *out_L);
+bool fasta_file_read_record(FastaFile *fp, char **out_seq, char **out_header, int *out_seq_len);
 
 /**
  * Frees the resource for the FastaFile.

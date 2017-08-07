@@ -19,3 +19,5 @@ clean:
 astyle:
 	astyle $(ASTYLE_FLAGS) $(SRCS) $(HEADER)
 
+doc: $(HEADER)
+	doxygen

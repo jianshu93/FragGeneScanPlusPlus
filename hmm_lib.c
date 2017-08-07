@@ -820,7 +820,7 @@ void viterbi(HMM *hmm_ptr, char *O, char *output_buffer, char *aa_buffer,
             //!! Transfer all of the output buffer writing code to another function. Modularize this.
 
             if (dna_id > gene_len) {
-                print_outputs(strand, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
+                print_gene(strand, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
                               dna, dna_id + 1, dna_seq, dna1, dna_f, dna_f1, protein, insert, c_delete, insert_id, delete_id, format, temp_str_ptr,multiple);
                 multiple++;
             }
@@ -1106,7 +1106,7 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
 
 }
 
-void print_outputs(Strand strand, int start_t, int end_t, int frame, char *output_buffer, char *aa_buffer, char *dna_buffer,
+void print_gene(Strand strand, int start_t, int end_t, int frame, char *output_buffer, char *aa_buffer, char *dna_buffer,
                    char *sequence_head_short, char *dna, int dna_len, Nucleotide dna_seq[], char *rc_dna, char *dna_f, char *rc_dna_f, char *protein,
                    int *insertions, int *deletions, int insertions_len, int deletions_len, bool format, char *temp_str_ptr, unsigned int multiple) {
     int i;

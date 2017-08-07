@@ -214,7 +214,9 @@ typedef struct {
     /** The hidden Markov model that will be used in this thread. */
     HMM *hmm;
 
+    /** Whether the input sequence(s) are whole genomes or only reads. */
     bool wholegenome;
+    /** Whether to write out formatted output */
     bool format;
 
     unsigned int *output_num_sequences;
@@ -251,6 +253,7 @@ typedef struct {
     SEM_T sema_w;
 } ThreadData;
 
+/** The data for the worker threads */
 ThreadData *thread_datas;
 
 /** The Hidden Markov model that is used by all threads */
@@ -260,23 +263,62 @@ TRAIN train;
 /**
  * Creates the data for a worker thread
  */
-void thread_data_init(ThreadData* td, unsigned int id);
-int read_seq_into_buffer(FastaFile* fp, ThreadData *td, unsigned int buf, bool initial_input);
+void thread_data_init(ThreadData *td, unsigned int id);
+
+/**
+ * Reads as many records as possible and puts them into the given buffer of a worker thread.
+ *
+ * @param fp The FASTA file to read the input records from
+ * @param td The worker thread that should receive the records.
+ * @param buf The appropriate buffer in the worker thread.
+ * @param initial_input: whether this is the first time the buffer received any input.
+ */
+int read_seq_into_buffer(FastaFile *fp, ThreadData *td, unsigned int buf, bool initial_input);
 
 void get_prob_from_cg(HMM *hmm, TRAIN *train, char *O, int len_seq);
+
+/**
+ * Load the training data for the given HMM.
+ */
 void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mfilename1, char *nfilename,
                          char *sfilename,char *pfilename,char *s1filename,char *p1filename, char *dfilename, TRAIN *train_ptr);
-void viterbi(HMM *hmm_ptr, char *O, char* output_buffer, char* aa_buffer, char *dna_buffer,
-             char *sequence_head, bool whole_genome, bool format, int len_seq,
-             char* dna_ptr, char* dna1_ptr, char* dna_f_ptr, char* dna_f1_ptr, char* protein_ptr,
-             int* insert_ptr, int* c_delete_ptr, char* temp_str_ptr);
 
+/**
+ * Performs gene prediction on the given sequence and writes out the predicted genes.
+ *
+ * @param hmm_ptr The Hidden Markrov model that will be used.
+ * @param input_seq The complete input sequence.
+ * @param output_buffer A pre-allocated buffer to store the resulting meta-information.
+ * @param aa_buffer A pre-allocated buffer to store the FASTA of the translated proteins.
+ * @param dna_buffer A pre-allocated buffer to store the FASTA of the predicted genes.
+ * @param sequence_head The header of the input sequence
+ * @param whole_genome Whether the input sequence is the whole genomic sequence.
+ * @param format Whether to use formatted output.
+ * @param seq_len The length of the input sequence.
+ * @param dna_ptr A pre-allocated buffer to contain the gene's dna.
+ * @param dna1_ptr A pre-allocated buffer to contain the gene's dna's reverse complement.
+ * @param dna_f_ptr A pre-allocated buffer to contain the gene's formatted dna.
+ * @param dna_f1_ptr A pre-allocated buffer to contain the gene's formatted dna's reverse complement.
+ * @param protein_ptr A pre-allocated buffer to contain the translated protein sequence.
+ * @param insertions An allocated list to store the positions of the insertions.
+ * @param deletions An allocated list to store the positions of the deletions.
+ * @param temp_str_ptr A pre-allocated general-purpose buffer.
+ */
+void viterbi(HMM *hmm_ptr, char *input_seq, char* output_buffer, char* aa_buffer, char *dna_buffer,
+             char *sequence_head, bool whole_genome, bool format, int seq_len,
+             char* dna_ptr, char* dna1_ptr, char* dna_f_ptr, char* dna_f1_ptr, char* protein_ptr,
+             int* insertions, int* deletions, char* temp_str_ptr);
+
+/**
+ * Frees any resources used by the given HMM.
+ */
 void free_hmm(HMM *hmm);
 
 /**
  * Calculates the reverse-complement of given DNA
  *
  * @param dna The DNA we want to take the reverse-complement of.
+ * @param dna_len The length of the DNA sequence.
  * @param[out] rc_dna The output buffer for the reverse-complement.
  */
 void get_rc_dna(Nucleotide dna[], int dna_len, char *rc_dna);
@@ -324,16 +366,15 @@ void print_usage();
  * @param protein buffer which you can fill with the translated gene.
  * @param temp_str_ptr General-purpose string buffer
  */
-void print_outputs(int codon_start, int start_t, int end_t, int frame,
-                   char *output_buffer, char *aa_buffer, char *dna_buffer,
-                   char *sequence_head_short,
-                   char *dna, int dna_len, Nucleotide dna_seq[], char *rc_dna, char* dna_f, char *rc_dna_f, char *protein,
-                   int *insertions, int *deletions, int insertions_len, int deletions_len,
-                   bool format, char *temp_str_ptr, unsigned int multiple);
+void print_gene(int codon_start, int start_t, int end_t, int frame,
+                char *output_buffer, char *aa_buffer, char *dna_buffer,
+                char *sequence_head_short,
+                char *dna, int dna_len, Nucleotide dna_seq[], char *rc_dna, char* dna_f, char *rc_dna_f, char *protein,
+                int *insertions, int *deletions, int insertions_len, int deletions_len,
+                bool format, char *temp_str_ptr, unsigned int multiple);
 
 // helper functions to cleanup the main function
 void setTrainDirectory(char* train_path);
-void conductWork();
 
 /**
  * Initializes the writer thread and the worker threads.
@@ -342,5 +383,4 @@ void initializeThreads();
 
 void destroySemaphores();
 void initializeSemaphores();
-void setupProgram(int argc, char** argv);
 #endif
