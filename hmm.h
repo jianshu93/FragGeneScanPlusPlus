@@ -124,9 +124,9 @@ typedef enum {
 } HMM_StateTransition;
 
 /** The translation table to use for codon translation */
-char *translation_table[65];
+char *translation_table;
 /** The translation table to use for anti-codon translation */
-char *translation_table_rc[65];
+char *translation_table_rc;
 
 // semaphores
 #ifdef __APPLE__

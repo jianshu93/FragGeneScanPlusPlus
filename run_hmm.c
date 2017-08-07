@@ -137,7 +137,7 @@ void parseArguments(int argc, char **argv) {
             break;
         }
 
-        if (!parse_translation_tables(translation_table_id, translation_table, translation_table_rc)) {
+        if (!parse_translation_tables(translation_table_id, &translation_table, &translation_table_rc)) {
             fprintf(stderr, "ERROR: No translation table with number %s\n", optarg);
             exit(EXIT_FAILURE);
         }

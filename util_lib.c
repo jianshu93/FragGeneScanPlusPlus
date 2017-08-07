@@ -245,10 +245,10 @@ void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand stra
 
     if (strand == FORWARD_STRAND) {
         for (i = 0; i < dna_len; i += 3)
-            protein[i/3] = (*translation_table)[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
+            protein[i/3] = translation_table[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
     } else {
         for (i = 0; i < dna_len; i += 3)
-            protein[(dna_len-i)/3-1] = (*translation_table_rc)[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
+            protein[(dna_len-i)/3-1] = translation_table_rc[trinucleotide_pep(dna[i], dna[i+1], dna[i+2])];
     }
 }
 
