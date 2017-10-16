@@ -258,9 +258,9 @@ void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand stra
 void print_usage() {
 
     printf("%s", "NOTE: FGS++ should always be run from the FragGeneScan++ directory where the train directory is.\n");
-    printf("%s", "USAGE: ./FGS++ -s [seq_file_name] -m [max_mem_use] -o [output_file_name] -w [1 or 0] -t [train_file_name] -p [thread_num] -e [1 or 0] -d [1 or 0] \n");
-    printf("%s", "EXAMPLE USAGE: ./FGS++ -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16 \n");
-    printf("%s", "MINIMAL USAGE: ./FGS++ -s [seq_file_name] -o [output_file_name] -w [1 or 0] -t [train_file_name] \n");
+    printf("%s", "USAGE: build/FGS++ -s [seq_file_name] -m [max_mem_use] -o [output_file_name] -w [1 or 0] -t [train_file_name] -p [thread_num] -e [1 or 0] -d [1 or 0] \n");
+    printf("%s", "EXAMPLE USAGE: build/FGS++ -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16 \n");
+    printf("%s", "MINIMAL USAGE: build/FGS++ -s [seq_file_name] -o [output_file_name] -w [1 or 0] -t [train_file_name] \n");
     printf("%s", "INFO: FragGeneScan++ will only output the amino acid files by default. To obtain the meta information set -e 1 and for the DNA files set -d 1\n\n");
     printf("%s", "       Mandatory parameters\n");
     printf("%s", "       -s [seq_file_name]:    sequence file name including the full path\n");
