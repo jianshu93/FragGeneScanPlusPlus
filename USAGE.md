@@ -1,28 +1,29 @@
-FragGeneScan Manual
+FragGeneScan++ Manual
 ===================
 
 ## Installation
-To install FragGeneScanPlus, please follow the steps below:
+To install FragGeneScan++, please follow the steps below:
 
-1. Untar the downloaded file "FragGeneScanPlus.tar.gz". This will automatically generate the directory "FragGeneScan".
+1. Untar the downloaded file "FragGeneScan++.tar.gz". This will automatically
+   generate the directory "FragGeneScan++".
 2. Make sure that you also have the gcc C compiler.
-3. Run "makefile" to compile and build executable "FGS+"
+3. Run "makefile" to compile and build executable "FGS++"
 ```
 make clean && make
 ```
 
 
 ## Usage
-* To run FragGeneScanPlus, you can use the following info:
+* To run FragGeneScan++, you can use the following info:
 
 ```
-USAGE: ./FGS+ -s [seq_file_name] -m [max_mem_use] -o [output_file_name] -w [1 or 0] -t [train_file_name] -p [thread_num] -e [1 or 0] -d [1 or 0]
+USAGE: ./FGS++ -s [seq_file_name] -m [max_mem_use] -o [output_file_name] -w [1 or 0] -t [train_file_name] -p [thread_num] -e [1 or 0] -d [1 or 0]
 
-EXAMPLE USAGE: ./FGS+ -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16
+EXAMPLE USAGE: ./FGS++ -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16
 
-MINIMAL USAGE: ./FGS+ -s [seq_file_name] -o [output_file_name] -w [1 or 0] -t [train_file_name]
+MINIMAL USAGE: ./FGS++ -s [seq_file_name] -o [output_file_name] -w [1 or 0] -t [train_file_name]
 
-INFO: FragGeneScanPlus will only output the amino acid files by default. To obtain the gene coordinate information set -e to 1 and for the DNA files set -d to 1
+INFO: FragGeneScan++ will only output the amino acid files by default. To obtain the gene coordinate information set -e to 1 and for the DNA files set -d to 1
 
        Mandatory parameters
        -s [seq_file_name]:    sequence file name including the full path
@@ -42,28 +43,28 @@ INFO: FragGeneScanPlus will only output the amino acid files by default. To obta
                            [illumina_10] for Illumina sequencing reads with about 1% error rate
 
        Optional flags
-       -p [thread_num]     The number of threads used by FragGeneScan; default is 1 thread.
+       -p [thread_num]     The number of threads used by FragGeneScan++; default is 1 thread.
        -e [1 or 0]         Output metadata for sequences.
        -d [1 or 0]         Output DNA file.
        -m [max_mem_usage]  Maximum amount of memory to be used per thread, in megabytes, default 1024 for 1GB
 ```
 
-* To test FragGeneScanPlus with a complete genomic sequence,
+* To test FragGeneScan++ with a complete genomic sequence,
 ```
-./FGS+ -genome=./example/NC_000913.fna -out=./example/NC_000913.test  -complete=1  -train=complete
+./FGS++ -genome=./example/NC_000913.fna -out=./example/NC_000913.test  -complete=1  -train=complete
 
 [NC_000913.fna]: this sequence file has the complete genomic sequence of E.coli
 ```
 
-* To test FragGeneScanPlus with sequencing reads,
+* To test FragGeneScan++ with sequencing reads,
 ```
-./FGS+ -genome=./example/NC_000913-454.fna -out=./example/NC_000913-454.test  -complete=0  -train=454_10
+./FGS++ -genome=./example/NC_000913-454.fna -out=./example/NC_000913-454.test  -complete=0  -train=454_10
 
 [NC_000913-454.fna]: this sequence file has simulated reads (pyrosequencing, average length = 400 bp and sequencing error = 1%) generated using Metasim
 ```
 
 ## Output
-Upon completion, FragGeneScanPlus can generate three files [output_file_name].faa , [output_file_name].out and [output_file_name].ffn.
+Upon completion, FragGeneScan++ can generate three files [output_file_name].faa , [output_file_name].out and [output_file_name].ffn.
 
 * The "[output_file_name].faa" file lists amino acid sequences corresponding to the putative genes in "[output_file_name].out".
 The "[output_file_name].faa" file is always generated and needs no flags to trigger it's output.

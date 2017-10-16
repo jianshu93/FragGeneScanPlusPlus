@@ -3,7 +3,7 @@ out*
 *.faa
 *.txt
 *.swp
-FGS+
+FGS++
 
 # Documentation
 doc/
