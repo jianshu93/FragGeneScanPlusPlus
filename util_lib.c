@@ -257,37 +257,35 @@ void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand stra
 
 void print_usage() {
 
-    printf("%s", "NOTE: FGS++ should always be run from the FragGeneScan++ directory where the train directory is.\n");
-    printf("%s", "USAGE: build/FGS++ -s [seq_file_name] -m [max_mem_use] -o [output_file_name] -w [1 or 0] -t [train_file_name] -p [thread_num] -e [1 or 0] -d [1 or 0] \n");
-    printf("%s", "EXAMPLE USAGE: build/FGS++ -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16 \n");
-    printf("%s", "MINIMAL USAGE: build/FGS++ -s [seq_file_name] -o [output_file_name] -w [1 or 0] -t [train_file_name] \n");
-    printf("%s", "INFO: FragGeneScan++ will only output the amino acid files by default. To obtain the meta information set -e 1 and for the DNA files set -d 1\n\n");
-    printf("%s", "       Mandatory parameters\n");
-    printf("%s", "       -s [seq_file_name]:    sequence file name including the full path\n");
-    printf("%s", "                              for standard input specify as stdin\n");
-    printf("%s", "       -o [output_file_name]: output file name including the full path\n");
-    printf("%s", "                              for standard output specify as stdout\n");
-    printf("%s", "       -w [1 or 0]:           1 if the sequence file has complete genomic sequences\n");
-    printf("%s", "       		                    0 if the sequence file has short sequence reads\n");
-    printf("%s", "       -t [train_file_name]:  file name that contains model parameters; this file should be in the -r directory\n");
-    printf("%s", "                           Note that four files containing model parameters already exist in the \"train\" directory\n");
-    printf("%s", "                           [complete] for complete genomic sequences or short sequence reads without sequencing error\n");
-    printf("%s", "                           [sanger_5] for Sanger sequencing reads with about 0.5% error rate\n");
-    printf("%s", "                           [sanger_10] for Sanger sequencing reads with about 1% error rate\n");
-    printf("%s", "                           [454_5] for 454 pyrosequencing reads with about 0.5% error rate\n");
-    printf("%s", "                           [454_10] for 454 pyrosequencing reads with about 1% error rate\n");
-    printf("%s", "                           [454_30] for 454 pyrosequencing reads with about 3% error rate\n");
-    printf("%s", "                           [illumina_1] for Illumina sequencing reads with about 0.1% error rate\n");
-    printf("%s", "                           [illumina_5] for Illumina sequencing reads with about 0.5% error rate\n");
-    printf("%s", "                           [illumina_10] for Illumina sequencing reads with about 1% error rate\n\n");
-    printf("%s", "       Optional flags\n");
-    printf("%s", "       -r [train_file_dir]:  full path of directory containing the model files. If not specified \"train/\" assumed\n");
-    printf("%s", "       -p [thread_num]     The number of threads used by FragGeneScan++; default is 1 thread.\n");
-    printf("%s", "       -e [1 or 0]         Output metadata for sequences.\n");
-    printf("%s", "       -d [1 or 0]         Output DNA file.\n");
-    printf("%s", "       -m [max_mem_usage]  Maximum amount of memory to be used by the application, in megabytes, default 1024 for 1GB\n");
-    printf("%s", "       -x [translation_table]  Which translation table to use (default: 11)\n");
-
+    puts("USAGE: FGS++ -s [seq_file_name] -m [max_mem_use] -o [output_file_name] -w [1 or 0] -t [train_file_name] -p [thread_num] -e [1 or 0] -d [1 or 0] ");
+    puts("EXAMPLE USAGE: FGS++ -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16 ");
+    puts("MINIMAL USAGE: FGS++ -s [seq_file_name] -o [output_file_name] -w [1 or 0] -t [train_file_name] ");
+    puts("INFO: FragGeneScan++ will only output the amino acid files by default. To obtain the meta information set -e 1 and for the DNA files set -d 1\n");
+    puts("    Mandatory parameters:");
+    puts("       -s [seq_file_name]:    sequence file name including the full path");
+    puts("                              for standard input specify as stdin");
+    puts("       -o [output_file_name]: output file name including the full path");
+    puts("                              for standard output specify as stdout");
+    puts("       -w [1 or 0]:           1 if the sequence file has complete genomic sequences");
+    puts("       		                0 if the sequence file has short sequence reads");
+    puts("       -t [train_file_name]:  file name that contains model parameters; this file should be in the -r directory");
+    puts("                           Note that four files containing model parameters already exist in the \"train\" directory");
+    puts("                           [complete] for complete genomic sequences or short sequence reads without sequencing error");
+    puts("                           [sanger_5] for Sanger sequencing reads with about 0.5% error rate");
+    puts("                           [sanger_10] for Sanger sequencing reads with about 1% error rate");
+    puts("                           [454_5] for 454 pyrosequencing reads with about 0.5% error rate");
+    puts("                           [454_10] for 454 pyrosequencing reads with about 1% error rate");
+    puts("                           [454_30] for 454 pyrosequencing reads with about 3% error rate");
+    puts("                           [illumina_1] for Illumina sequencing reads with about 0.1% error rate");
+    puts("                           [illumina_5] for Illumina sequencing reads with about 0.5% error rate");
+    puts("                           [illumina_10] for Illumina sequencing reads with about 1% error rate\n");
+    puts("    Optional flags");
+    puts("       -r [train_file_dir]:    Full path of the directory containing the training model files.");
+    puts("       -p [thread_num]         The number of threads used by FragGeneScan++; default is 1 thread.");
+    puts("       -e [1 or 0]             Output metadata for sequences.");
+    puts("       -d [1 or 0]             Output DNA file.");
+    puts("       -m [max_mem_usage]      Maximum amount of memory to be used by the application, in megabytes, default 1024 for 1GB");
+    puts("       -x [translation_table]  Which translation table to use (default: 11)");
 }
 
 void stopMemset(char *ptr, int length) {
