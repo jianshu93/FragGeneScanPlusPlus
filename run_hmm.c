@@ -349,7 +349,7 @@ void readerThread() {
 }
 
 int main (int argc, char **argv) {
-    setTrainDirectory("train");
+    setTrainDirectory(PKGDATADIR "/train");
 
     parseArguments(argc, argv);
 
