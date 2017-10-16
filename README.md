@@ -1,13 +1,14 @@
 # FragGeneScan++
 An improved version of [FragGeneScan-Plus][fgsp].
 
-# Build
-To build FragGeneScan++ from source, run the following commands from the source
+# Installing
+To build/install FragGeneScan++ from source, you will need [Meson][meson]. run the following commands from the source
 repository:
 
 ```sh
-make clean
-make
+meson build
+ninja -C build
+sudo ninja -C build install
 ```
 
 To run FragGeneScan++, see the [USAGE.md](USAGE.md) file.
@@ -21,3 +22,4 @@ Please see the LICENSE file for further information.
 
 
 [fgsp]: https://github.com/hallamlab/FragGeneScanPlus/
+[meson]: https://mesonbuild.com/

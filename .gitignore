@@ -1,12 +1,5 @@
-*.o
-out*
-*.faa
-*.txt
-*.swp
-FGS++
-
+# Technically, meson lets you choose an arbitrary build directory,
+# but let's keep the most common name out of our git by default.
+build/
 # Documentation
 doc/
-
-# OSX files
-.DS_Store
