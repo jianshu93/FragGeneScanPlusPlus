@@ -1,19 +1,6 @@
 FragGeneScan++ Manual
 ===================
 
-## Installation
-To install FragGeneScan++, please follow the steps below:
-
-1. Untar the downloaded file "FragGeneScan++.tar.gz". This will automatically
-   generate the directory "FragGeneScan++".
-2. Make sure that you also have the gcc C compiler.
-3. Run "makefile" to compile and build executable "FGS++"
-```
-make clean && make
-```
-
-
-## Usage
 * To run FragGeneScan++, you can use the following info:
 
 ```
