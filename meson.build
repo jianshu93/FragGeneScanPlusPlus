@@ -62,30 +62,34 @@ install_subdir('train',
 )
 
 # Documentation
-doxyfile = configure_file(
-  input: 'Doxyfile.in',
-  output: 'Doxyfile',
-  configuration: conf,
-)
-custom_target('docs',
-  input: doxyfile,
-  output: 'doc',
-  build_by_default: doxygen.found(),
-  command: doxygen,
-)
+if doxygen.found()
+  doxyfile = configure_file(
+    input: 'Doxyfile.in',
+    output: 'Doxyfile',
+    configuration: conf,
+  )
+  custom_target('docs',
+    input: doxyfile,
+    output: 'doc',
+    build_by_default: doxygen.found(),
+    command: doxygen,
+  )
+endif
 
 # Coding conventions
-custom_target('astyle',
-  input: fgs_sources,
-  output: fgs_sources,
-  command: [
-    astyle,
-    '--mode=c',
-    '--style=google',
-    '-s4',
-    '-n',
-    '-H',
-    '-k3',
-    '@INPUT@',
-  ],
-)
+if astyle.found()
+  custom_target('astyle',
+    input: fgs_sources,
+    output: fgs_sources,
+    command: [
+      astyle,
+      '--mode=c',
+      '--style=google',
+      '-s4',
+      '-n',
+      '-H',
+      '-k3',
+      '@INPUT@',
+    ],
+  )
+endif
