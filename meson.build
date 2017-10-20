@@ -49,7 +49,7 @@ fgs_dependencies = [
   threads,
 ]
 
-executable('FGS++', fgs_sources,
+FGSpp = executable('FGS++', fgs_sources,
   dependencies: fgs_dependencies,
   c_args: fgs_flags,
   include_directories: include_directories('.'), # include config.h
