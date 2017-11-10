@@ -70,9 +70,9 @@ if doxygen.found()
   )
   custom_target('docs',
     input: doxyfile,
+    depend_files: fgs_sources,
     output: 'doc',
-    build_by_default: doxygen.found(),
-    command: doxygen,
+    command: [ doxygen, '@INPUT@' ],
   )
 endif
 

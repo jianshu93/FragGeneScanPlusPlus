@@ -20,6 +20,17 @@ FGS++ -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16
 
 For more info or a list of all options, run FragGeneScan++ without arguments.
 
+## Documentation
+To get the most recent version of the documentation, issue the following
+command:
+
+```
+ninja -C build docs
+```
+
+The documentation can then be viewed by opening `build/doc/html/index.html` in
+your favorite browser.
+
 ### Output files
 Upon completion, FragGeneScan++ can generate 3 files:
 
