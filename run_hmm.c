@@ -8,7 +8,7 @@ bool wholegenome = false;
 bool output_dna = false;
 bool output_meta = false;
 bool verbose = false;
-int max_mem = 0;
+int chunk_size = 0;
 unsigned int threadnum = 1;
 char aa_file[STRINGLEN];
 char seq_file[STRINGLEN];
@@ -28,7 +28,6 @@ char s1state_file[STRINGLEN];     /* stop codon of gene in - stand */
 char p1state_file[STRINGLEN];
 char dstate_file[STRINGLEN];
 
-unsigned int MAX_BYTES_PER_BUFFER;
 unsigned int MAX_SEQS_PER_BUFFER;
 
 /* READER THREAD */
@@ -69,7 +68,7 @@ void parseArguments(int argc, char **argv) {
     int c;
     int translation_table_id = 11;
 
-    while ((c = getopt(argc, argv, "dem:o:p:r:s:t:vw:x:")) != -1) {
+    while ((c = getopt(argc, argv, "dec:o:p:r:s:t:vw:x:")) != -1) {
         switch (c) {
         case 'd':
             output_dna = true;
@@ -77,8 +76,8 @@ void parseArguments(int argc, char **argv) {
         case 'e':
             output_meta = true;
             break;
-        case 'm':
-            max_mem = atoi(optarg);
+        case 'c':
+            chunk_size = atoi(optarg);
             break;
         case 'o':
             strcpy(out_file, optarg);
@@ -186,14 +185,13 @@ void checkFiles() {
 
 void setMemoryLimits() {
     /* check for mem limit, allocate buffer */
-    if (max_mem <= 0) {
-        printf("Max memory limit specified invalid, defaulting to 1024MB\n");
-        max_mem = 1024;
+    if (chunk_size <= 0) {
+        printf("Minimum chunk size specified invalid, defaulting to 1\n");
+        chunk_size = 1;
     }
 
     // 5 stands for the number of buffers we are currently using per thread
-    MAX_BYTES_PER_BUFFER = max_mem*100000/(5*2*threadnum);
-    MAX_SEQS_PER_BUFFER = MAX_BYTES_PER_BUFFER/STRINGLEN;
+    MAX_SEQS_PER_BUFFER = chunk_size;
 }
 
 void checkOutputFiles() {
@@ -361,8 +359,7 @@ int main (int argc, char **argv) {
 
     initializeSemaphores();
 
-    log_debug("Max number of sequences per thread : %d, max bytes per thread : %d\n",
-              MAX_SEQS_PER_BUFFER, MAX_BYTES_PER_BUFFER*5);
+    log_debug("Max number of sequences per thread : %d\n", MAX_SEQS_PER_BUFFER);
 
     /* read all initial model */
     get_train_from_file(hmm_file, &hmm, mstate_file, rstate_file, nstate_file, sstate_file, pstate_file,s1state_file, p1state_file, dstate_file, &train);

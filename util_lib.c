@@ -257,7 +257,7 @@ void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand stra
 
 void print_usage() {
 
-    puts("USAGE: FGS++ -s [seq_file_name] -m [max_mem_use] -o [output_file_name] -w [1 or 0] -t [train_file_name] -p [thread_num] -e [1 or 0] -d [1 or 0] ");
+    puts("USAGE: FGS++ -s [seq_file_name] -c [chunk_size] -o [output_file_name] -w [1 or 0] -t [train_file_name] -p [thread_num] -e [1 or 0] -d [1 or 0] ");
     puts("EXAMPLE USAGE: FGS++ -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16 ");
     puts("MINIMAL USAGE: FGS++ -s [seq_file_name] -o [output_file_name] -w [1 or 0] -t [train_file_name] ");
     puts("INFO: FragGeneScan++ will only output the amino acid files by default. To obtain the meta information set -e 1 and for the DNA files set -d 1\n");
@@ -284,7 +284,7 @@ void print_usage() {
     puts("       -p [thread_num]         The number of threads used by FragGeneScan++; default is 1 thread.");
     puts("       -e [1 or 0]             Output metadata for sequences.");
     puts("       -d [1 or 0]             Output DNA file.");
-    puts("       -m [max_mem_usage]      Maximum amount of memory to be used by the application, in megabytes, default 1024 for 1GB");
+    puts("       -c [chunk_size]         Number of sequences in a chunk, scales speed and memory usage.");
     puts("       -x [translation_table]  Which translation table to use (default: 11)");
 }
 
