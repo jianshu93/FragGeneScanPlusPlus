@@ -128,13 +128,22 @@ const char *translation_table;
 /** The translation table to use for anti-codon translation */
 const char *translation_table_rc;
 
+/* Macro to have easy debug messages */
+#define log_debug(...) \
+            do { \
+              if (verbose) { \
+                fprintf(stdout, "[Debug] %s (line %d):  ", __FILE__, __LINE__); \
+                fprintf(stdout, __VA_ARGS__); \
+              } \
+            } while (0)
+
 // semaphores
 #ifdef __APPLE__
 typedef sem_t* SEM_T;
 #elif __linux
 typedef sem_t SEM_T;
-#define sem_wait(x) sem_wait(&x)
-#define sem_post(x) sem_post(&x)
+#define sem_wait(x) log_debug("waiting %s\n", #x);sem_wait(&x);log_debug("got %s\n", #x)
+#define sem_post(x) log_debug("posting %s\n", #x);sem_post(&x);log_debug("put %s\n", #x)
 #endif
 
 /**
@@ -146,6 +155,10 @@ SEM_T sema_Q;
  * before it's fully read.
  */
 SEM_T sema_R;
+/**
+ * Protects the boolean indicating all input is read
+ */
+SEM_T sema_F;
 
 SEM_T sema_r;
 SEM_T sema_w;

@@ -47,15 +47,6 @@ FILE *dna_outfile_fp;
 /** The nr of sequences the writer thread has outputted */
 long writer_counter = 0;
 
-/* Macro to have easy debug messages */
-#define log_debug(...) \
-            do { \
-              if (verbose) { \
-                fprintf(stdout, "[Debug] %s (line %d):  ", __FILE__, __LINE__); \
-                fprintf(stdout, __VA_ARGS__); \
-              } \
-            } while (0)
-
 void parseArguments(int argc, char **argv) {
     /* read command line argument */
     //!! This argument reading should all be encapsulated in a single function, this will make reading the code much easier, right now we have to always move around it.
@@ -228,11 +219,13 @@ void initializeSemaphores() {
 #ifdef __APPLE__
     sem_unlink("/sema_Q");
     sem_unlink("/sema_R");
+    sem_unlink("/sema_F");
     sem_unlink("/sema_r");
     sem_unlink("/sema_w");
 
     if ((sema_Q = sem_open("/sema_Q", O_CREAT, 0644, 1)) == SEM_FAILED ||
             (sema_R = sem_open("/sema_R", O_CREAT, 0644, 1)) == SEM_FAILED ||
+            (sema_F = sem_open("/sema_F", O_CREAT, 0644, 1)) == SEM_FAILED ||
             (sema_r = sem_open("/sema_r", O_CREAT, 0644, 1)) == SEM_FAILED ||
             (sema_w = sem_open("/sema_w", O_CREAT, 0644, 1)) == SEM_FAILED) {
         perror("ERROR: sem_open");
@@ -242,6 +235,7 @@ void initializeSemaphores() {
 #elif __linux
     sem_init(&sema_Q, 0, 1);
     sem_init(&sema_R, 0, 1);
+    sem_init(&sema_F, 0, 1);
     sem_init(&sema_r, 0, 0);
     sem_init(&sema_w, 0, 0);
 #endif
@@ -252,6 +246,7 @@ void destroySemaphores() {
 #ifdef __APPLE__
     sem_unlink("/sema_Q");
     sem_unlink("/sema_R");
+    sem_unlink("/sema_F");
     sem_unlink("/sema_r");
     sem_unlink("/sema_w");
 
@@ -268,6 +263,7 @@ void destroySemaphores() {
 #elif __linux
     sem_destroy(&sema_Q);
     sem_destroy(&sema_R);
+    sem_destroy(&sema_F);
     sem_destroy(&sema_r);
     sem_destroy(&sema_w);
 #endif
@@ -331,8 +327,11 @@ void readerThread() {
             stopped_at_fpos = read_seq_into_buffer(fp,  temp->td, temp->buffer, false);
 
             /* We've fully read the input sequence file */
-            if (stopped_at_fpos == 0)
+            if (stopped_at_fpos == 0) {
+                sem_wait(sema_F);
                 num_reads_flag = true;
+                sem_post(sema_F);
+            }
 
             sem_post(sema_R);
 
@@ -343,7 +342,11 @@ void readerThread() {
 
     log_debug("Finished handing out all the work...\n");
     fasta_file_free(fp);
+
+    sem_wait(sema_F);
+    sem_post(sema_w); /* ensure it doesn't block */
     num_reads_flag = true;
+    sem_post(sema_F);
 }
 
 int main (int argc, char **argv) {
@@ -552,10 +555,12 @@ void closeFilePointers( FILE **aa_outfile_fp, FILE **outfile_fp, FILE **dna_outf
 void *writerThread(void *args) {
     FILE *aa_outfile_fp = openFilePointers();
 
+    sem_wait(sema_F);
     while (true) {
         QUEUE *temp;
 
         sem_wait(sema_w);
+        sem_post(sema_F);
 
         /* Fetch the queue of worker threads that are done */
         sem_wait(sema_Q);
@@ -577,9 +582,11 @@ void *writerThread(void *args) {
         }
 
         /* Check if we're done, i.e. the whole input was read and processed*/
+        sem_wait(sema_F);
         if (num_reads_flag && writer_counter == read_counter)
             break;
     }
+    sem_post(sema_F);
 
     /* We're done writing, so close the output files */
     closeFilePointers(&aa_outfile_fp, &outfile_fp, &dna_outfile_fp );
