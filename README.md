@@ -1,37 +1,36 @@
 # FragGeneScan++
-An improved version of [FragGeneScan-Plus][fgsp].
 
-## Installing
-To build/install FragGeneScan++ from source, you will need [Meson][meson]. run the following commands from the source
-repository:
+A modified fork of [FragGeneScan-Plus][fgsp].
 
-```sh
-meson build
-ninja -C build
-sudo ninja -C build install
-```
+
+## Installation
+
+The installation instruction from [FGS+][fgsp install] remain valid:
+
+1. Install `make` and `gcc`.
+
+2. Clone this repository and go to the repository root.
+
+   ```sh
+   git clone https://github.com/unipept/FragGeneScanPlusPlus.git
+   cd FragGeneScanPlusPlus
+   ```
+
+3. Run `make`.
+
 
 ## Running
+
 An example usage of FragGeneScan++ looks like the following:
 
 ```
-FGS++ -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16
+FGSpp -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16
 ```
 
 For more info or a list of all options, run FragGeneScan++ without arguments.
 
-## Documentation
-To get the most recent version of the documentation, issue the following
-command:
-
-```
-ninja -C build docs
-```
-
-The documentation can then be viewed by opening `build/doc/html/index.html` in
-your favorite browser.
-
 ### Output files
+
 Upon completion, FragGeneScan++ can generate 3 files:
 
 * The `[output_file].faa` file lists amino acid sequences in FASTA format
@@ -45,7 +44,9 @@ file consists of 5 columns ( _start position_, _end position_, _strand_,
 _frame_, and _score_). This file is not automatically generated: to obtain this
 file, set the `-e` flag to 1.
 
+
 ## License
+
 FragGeneScan++ is released under under the terms of the GNU General Public
 License, version 3 (or any later version), as published by the Free Software
 Foundation.
@@ -55,3 +56,4 @@ Please see the [LICENSE](LICENSE) file for further information.
 
 [fgsp]: https://github.com/hallamlab/FragGeneScanPlus/
 [meson]: https://mesonbuild.com/
+[fgsp install]: https://github.com/hallamlab/FragGeneScanPlus/wiki#setup-and-dependencies-1
