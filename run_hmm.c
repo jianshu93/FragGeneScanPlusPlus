@@ -343,7 +343,6 @@ void readerThread() {
     log_debug("Finished handing out all the work...\n");
     fasta_file_free(fp);
 
-    sem_wait(sema_F);
     sem_post(sema_w); /* ensure it doesn't block */
     num_reads_flag = true;
     sem_post(sema_F);
