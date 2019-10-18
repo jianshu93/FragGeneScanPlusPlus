@@ -24,7 +24,14 @@ The installation instruction from [FGS+][fgsp install] remain valid:
 An example usage of FragGeneScan++ looks like the following:
 
 ```
-FGSpp -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16
+./FGSpp -s example/NC_000913-454.fna -o output -w 0 -t 454_5 -p 16
+```
+
+If you're running `FGSpp` from outside the repo, supply the training
+directory location with `-r`:
+
+```
+FGSpp -s <this-repo>/example/NC_000913-454.fna -o output -w 0 -r <this-repo>/train -t 454_5 -p 16
 ```
 
 For more info or a list of all options, run FragGeneScan++ without arguments.
