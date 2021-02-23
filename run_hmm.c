@@ -311,8 +311,6 @@ void initializeThreads() {
 }
 
 void readerThread() {
-    int semFposted;
-    semFposted=0;
     // master loop - while we haven't exhausted reading the file yet
     while (stopped_at_fpos!=0) {
         sem_wait(sema_r);
@@ -333,7 +331,6 @@ void readerThread() {
                 sem_wait(sema_F);
                 num_reads_flag = true;
                 sem_post(sema_F);
-                semFposted=1;
             }
 
             sem_post(sema_R);
@@ -343,13 +340,9 @@ void readerThread() {
         }
     }
 
-    if(!semFposted){
-        sem_post(sema_F);
-    }
     log_debug("Finished handing out all the work...\n");
     fasta_file_free(fp);
 
-    sem_wait(sema_F);
     sem_post(sema_w); /* ensure it doesn't block */
     num_reads_flag = true;
     sem_post(sema_F);
@@ -559,9 +552,11 @@ void closeFilePointers( FILE **aa_outfile_fp, FILE **outfile_fp, FILE **dna_outf
 }
 
 void *writerThread(void *args) {
+    int first;
     FILE *aa_outfile_fp = openFilePointers();
 
     sem_wait(sema_F);
+    first=1;
     while (true) {
         QUEUE *temp;
 
@@ -588,6 +583,10 @@ void *writerThread(void *args) {
         }
 
         /* Check if we're done, i.e. the whole input was read and processed*/
+        if(first){
+            sleep(0.5);
+            first = 1;
+        }
         sem_wait(sema_F);
         if (num_reads_flag && writer_counter == read_counter)
             break;
