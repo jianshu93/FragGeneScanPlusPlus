@@ -45,12 +45,7 @@ int trinucleotide (Nucleotide a, Nucleotide b, Nucleotide c);
  * @param[out] protein The output buffer for the protein.
  * @param strand What strand to translate.
  */
-void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand strand);
-
-/**
- * Print out the usage info for the executable.
- */
-void print_usage();
+void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand strand, const char * translation_table, const char * translation_table_rc);
 
 /**
  * A queue for worker thread buffers.
@@ -63,13 +58,6 @@ typedef struct BufferQueue {
     /** The specific buffer */
     unsigned int buffer;
 } QUEUE;
-
-/** The queue of empty buffers, waiting for input by the reader thread. */
-QUEUE *q_empty_head;
-QUEUE *q_empty_tail;
-/** The queue of finished buffers, waiting for the writer thread to handle output. */
-QUEUE *q_done_head;
-QUEUE *q_done_tail;
 
 /**
  * Prints out the contents of the given buffer.

@@ -3,7 +3,8 @@
 void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
              char *dna_buffer, char *sequence_head, bool whole_genome,
              int len_seq, char *dna, char *dna_rc,
-             char *protein, int *insertions, int *deletions, char *temp_str_ptr) {
+             char *protein, int *insertions, int *deletions, char *temp_str_ptr,
+             const char *translation_table, const char *translation_table_rc) {
 
     int *vpath;                          // optimal path after backtracking
     int **path;                          // viterbi path array
@@ -809,7 +810,7 @@ void viterbi(HMM *hmm_ptr, const char *O, char *output_buffer, char *aa_buffer,
 
             if (dna_id > gene_len) {
                 print_gene(strand, start_t, end_t, frame, output_buffer, aa_buffer, dna_buffer, sequence_head,
-                           dna, dna_id + 1, dna_seq, dna_rc, protein, insertions, deletions, nr_insertions, nr_deletions, temp_str_ptr,multiple);
+                           dna, dna_id + 1, dna_seq, dna_rc, protein, insertions, deletions, nr_insertions, nr_deletions, temp_str_ptr,multiple, translation_table, translation_table_rc);
                 multiple++;
             }
 
@@ -1086,7 +1087,7 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename,
 
 void print_gene(Strand strand, int start_t, int end_t, int frame, char *output_buffer, char *aa_buffer, char *dna_buffer,
                 const char *sequence_head_short, const char *dna, int dna_len, const Nucleotide dna_seq[], char *rc_dna, char *protein,
-                const int *insertions, const int *deletions, int insertions_len, int deletions_len, char *temp_str_ptr, unsigned int multiple) {
+                const int *insertions, const int *deletions, int insertions_len, int deletions_len, char *temp_str_ptr, unsigned int multiple, const char *translation_table, const char *translation_table_rc) {
     int i;
     char strand_sign = (strand == FORWARD_STRAND)? '+' : '-';
 
@@ -1113,7 +1114,7 @@ void print_gene(Strand strand, int start_t, int end_t, int frame, char *output_b
         strcat(aa_buffer, "\t");
     sprintf(temp_str_ptr, "%s_%d_%d_%c\n", sequence_head_short, start_t, end_t, strand_sign);
     strcat(aa_buffer, temp_str_ptr);
-    get_protein(dna_seq, dna_len, protein, strand);
+    get_protein(dna_seq, dna_len, protein, strand, translation_table, translation_table_rc);
     sprintf(temp_str_ptr, "%s\n", protein);
     strcat(aa_buffer, temp_str_ptr);
 

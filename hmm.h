@@ -123,11 +123,6 @@ typedef enum {
     TR_ES1,
 } HMM_StateTransition;
 
-/** The translation table to use for codon translation */
-const char *translation_table;
-/** The translation table to use for anti-codon translation */
-const char *translation_table_rc;
-
 /* Macro to have easy debug messages */
 #define log_debug(...) \
             do { \
@@ -145,24 +140,6 @@ typedef sem_t SEM_T;
 #define sem_wait(x) log_debug("waiting %s\n", #x);sem_wait(&x);log_debug("got %s\n", #x)
 #define sem_post(x) log_debug("posting %s\n", #x);sem_post(&x);log_debug("put %s\n", #x)
 #endif
-
-/**
- * Should always be used when accessing/modifying a queue.
- */
-SEM_T sema_Q;
-/**
- * Used by the reader thread to make sure a worker thread doesn't try to handle input
- * before it's fully read.
- */
-SEM_T sema_R;
-/**
- * Protects the boolean indicating all input is read
- */
-SEM_T sema_F;
-
-SEM_T sema_r;
-SEM_T sema_w;
-
 
 /**
  * The Hidden Markov Model (HMM) used to predict sequencing errors.
@@ -262,13 +239,6 @@ typedef struct {
     SEM_T sema_w;
 } ThreadData;
 
-/** The data for the worker threads */
-ThreadData *thread_datas;
-
-/** The Hidden Markov model that is used by all threads */
-HMM hmm;
-TRAIN train;
-
 /**
  * Creates the data for a worker thread
  */
@@ -313,7 +283,8 @@ void get_train_from_file(char *filename, HMM *hmm_ptr, char *mfilename, char *mf
 void viterbi(HMM *hmm_ptr, const char *input_seq, char* output_buffer, char* aa_buffer, char *dna_buffer,
              char *sequence_head, bool whole_genome, int seq_len,
              char *dna_ptr, char *dna1_ptr, char *protein_ptr,
-             int *insertions, int *deletions, char *temp_str_ptr);
+             int *insertions, int *deletions, char *temp_str_ptr,
+             const char * translation_table, const char * translation_table_rc);
 
 /**
  * Frees any resources used by the given HMM.
@@ -329,6 +300,9 @@ void free_hmm(HMM *hmm);
  */
 void get_rc_dna(const Nucleotide dna[], int dna_len, char *rc_dna);
 
+/**
+ * Print out the usage info for the executable.
+ */
 void print_usage();
 
 /**
@@ -374,7 +348,8 @@ void print_gene(int codon_start, int start_t, int end_t, int frame,
                 const char *dna, int dna_len, const Nucleotide dna_seq[],
                 char *rc_dna, char *protein,
                 const int *insertions, const int *deletions, int insertions_len, int deletions_len,
-                char *temp_str_ptr, unsigned int multiple);
+                char *temp_str_ptr, unsigned int multiple,
+                const char *translation_table, const char *translation_table_rc);
 
 // helper functions to cleanup the main function
 void setTrainDirectory(char* train_path);

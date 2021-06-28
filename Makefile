@@ -1,19 +1,16 @@
 CC=gcc
-CFLAGS=-O3 -m64 -w -lm -lpthread
+CFLAGS=-g -m64 -w -lm -lpthread
 LDFLAGS=-lm -lpthread
 
-SRC = fasta.c hmm_lib.c run_hmm.c util_lib.c
-OBJ = ${SRC:.c=.o}
+FGSpp: run_hmm.o hmm_lib.o util_lib.o fasta.o
+	$(CC) $(CFLAGS) -o $@ $^
 
-all: FGSpp
-
-FGSpp: ${OBJ}
-	$(CC) -o $@ ${OBJ} ${LDFLAGS}
-
-.c.o:
-	$(CC) -c $(CFLAGS) $<
+run_hmm.o: hmm.h run_hmm.h translation_tables.h util_lib.h
+fasta.o: fasta.h
+hmm_lib.o: util_lib.h
+util_lib.o: util_lib.h
 
 clean:
 	rm -f *.o FGSpp
 
-.PHONY: clean all
+.PHONY: clean

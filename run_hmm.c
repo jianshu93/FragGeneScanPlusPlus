@@ -47,6 +47,36 @@ FILE *dna_outfile_fp;
 /** The nr of sequences the writer thread has outputted */
 long writer_counter = 0;
 
+/** The translation table to use for codon translation */
+const char *translation_table;
+/** The translation table to use for anti-codon translation */
+const char *translation_table_rc;
+
+/**
+ * Should always be used when accessing/modifying a queue.
+ */
+SEM_T sema_Q;
+/**
+ * Used by the reader thread to make sure a worker thread doesn't try to handle input
+ * before it's fully read.
+ */
+SEM_T sema_R;
+/**
+ * Protects the boolean indicating all input is read
+ */
+SEM_T sema_F;
+
+SEM_T sema_r;
+SEM_T sema_w;
+
+/** The data for the worker threads */
+ThreadData *thread_datas;
+
+/** The Hidden Markov model that is used by all threads */
+HMM hmm;
+TRAIN train;
+
+
 void parseArguments(int argc, char **argv) {
     /* read command line argument */
     //!! This argument reading should all be encapsulated in a single function, this will make reading the code much easier, right now we have to always move around it.
@@ -610,7 +640,8 @@ void runViterbiOnBuffers(ThreadData *td, unsigned int b) {
             viterbi(td->hmm, td->record_sequences[b][i], td->output_buffer[b][i],
                     td->aa_buffer[b][i], td->dna_buffer[b][i],
                     td->record_headers[b][i], td->wholegenome, td->record_sequences_lens[b][i],
-                    td->dna, td->dna1, td->protein, td->insert, td->c_delete, td->temp_str);
+                    td->dna, td->dna1, td->protein, td->insert, td->c_delete, td->temp_str,
+                    translation_table, translation_table_rc);
         }
     }
 

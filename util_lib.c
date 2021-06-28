@@ -4,6 +4,13 @@
 #include <string.h>
 #include "util_lib.h"
 
+/** The queue of empty buffers, waiting for input by the reader thread. */
+QUEUE *q_empty_head;
+QUEUE *q_empty_tail;
+/** The queue of finished buffers, waiting for the writer thread to handle output. */
+QUEUE *q_done_head;
+QUEUE *q_done_tail;
+
 // which corresponds to either 0 (done) or 1 (empty) buffer
 void enqueue(ThreadData *td, unsigned int buffer, unsigned int which) {
 
@@ -237,7 +244,7 @@ void get_rc_dna(const Nucleotide dna[], int dna_len, char *reverse_complement) {
         reverse_complement[dna_len-i-1] = NUCL_CHARACTERS_RC[dna[i]];
 }
 
-void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand strand) {
+void get_protein(const Nucleotide dna[], int dna_len, char *protein, Strand strand, const char *translation_table, const char *translation_table_rc) {
     int i;
 
     /* If our DNA sequence is not a multiple of 3, throw away the last nucleotides */
