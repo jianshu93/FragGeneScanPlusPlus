@@ -2,6 +2,8 @@
 
 A modified fork of [FragGeneScan-Plus][fgsp].
 
+**This tool is no longer maintained**. It was replaced by [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs), a drop-in replacement for FragGeneScan, implemented in rust. FragGeneScanRs is both faster and contains a number of bug fixes that are present in both FragGeneScan and FragGeneScanPlusPlus.
+
 
 ## Installation
 
